@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мої уроки | Список</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+        }
+        .lesson-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+        @media (max-width: 400px) {
+            .buttons-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans text-slate-900">
+
+    <!-- Header Section -->
+    <header class="bg-indigo-700 text-white py-12 px-4 shadow-lg">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Мої уроки</h1>
+            <p class="text-indigo-100 text-lg max-w-2xl mx-auto">
+                Список усіх доступних уроків та їх підрозділів.
+            </p>
+        </div>
+    </header>
+
+    <!-- Search/Filter -->
+    <div class="max-w-7xl mx-auto px-4 mt-8">
+        <div class="relative">
+            <input type="text" id="lessonSearch" placeholder="Пошук уроку за номером..." 
+                   class="w-full p-4 rounded-xl border border-slate-200 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all">
+        </div>
+    </div>
+
+    <!-- Lessons Grid -->
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        <div id="lessonsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- JavaScript will generate blocks here -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-100 border-t border-slate-200 py-8 mt-12 text-center text-slate-500">
+        <p>&copy; 2024 Мої уроки. Всі матеріали структуровано.</p>
+    </footer>
+
+    <script>
+        const container = document.getElementById('lessonsContainer');
+        const searchInput = document.getElementById('lessonSearch');
+
+        function renderLessons() {
+            let html = '';
+            for (let i = 1; i <= 105; i++) {
+                let buttonsHtml = '';
+                for (let j = 1; j <= 10; j++) {
+                    buttonsHtml += `
+                    <a href="lesson-${i}/part-${j}.html" 
+                       class="flex items-center justify-center bg-slate-50 hover:bg-indigo-600 hover:text-white text-slate-600 text-[10px] sm:text-xs font-bold py-2 rounded-lg transition-colors border border-slate-100 shadow-sm" 
+                       title="Урок ${i}.${j}">
+                        ${i}.${j}
+                    </a>`;
+                }
+
+                html += `
+                <div class="lesson-card bg-white border border-slate-200 rounded-2xl p-5 transition-all duration-300" data-lesson="${i}">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold text-slate-800">Урок №${i}</h2>
+                        <span class="bg-indigo-50 text-indigo-600 text-[10px] font-semibold px-2 py-1 rounded-full border border-indigo-100">
+                            UNIT ${i}
+                        </span>
+                    </div>
+                    <div class="buttons-grid">
+                        ${buttonsHtml}
+                    </div>
+                </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.trim();
+            const cards = document.querySelectorAll('.lesson-card');
+            
+            cards.forEach(card => {
+                const lessonNum = card.getAttribute('data-lesson');
+                if (lessonNum === term || lessonNum.startsWith(term) || term === '') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        window.onload = renderLessons;
+    </script>
+</body>
+</html>
