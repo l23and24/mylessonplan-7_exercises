@@ -31,19 +31,19 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 120px; /* Збільшено для дошки */
+            height: 120px;
             gap: 10px;
         }
 
         .symbol-text {
-            font-size: 1.5rem; /* Збільшено */
+            font-size: 1.5rem;
             font-weight: 800;
             color: #1e293b;
         }
 
         .unit-text {
             color: #64748b;
-            font-size: 1rem; /* Збільшено */
+            font-size: 1rem;
             font-weight: 600;
         }
 
@@ -57,6 +57,7 @@
             font-family: inherit;
         }
 
+        /* Анімація трясіння для помилки */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-6px); }
@@ -64,25 +65,24 @@
         }
         .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
 
-        @keyframes wink {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(1.15); color: #ef4444; }
+        /* Нова анімація пульсації (наближення-віддалення) */
+        @keyframes pulse-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); } /* Збільшення на 30% */
         }
+        
         .blink-element {
-            animation: wink 1.5s infinite ease-in-out;
+            animation: pulse-scale 1.2s infinite ease-in-out;
+            transform-origin: center; /* Важливо для коректного масштабування від центру літери */
+            fill: #ef4444 !important;
             font-weight: 900;
         }
 
         .triangle-container {
-            position: relative;
-            width: 320px; /* Збільшено для кращої видимості */
-            height: 280px;
-            margin: 20px auto;
-        }
-        .triangle-svg {
             width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.15));
+            max-width: 450px;
+            margin: 0 auto;
+            position: relative;
         }
 
         .fraction {
@@ -91,25 +91,25 @@
             vertical-align: middle;
             text-align: center;
             line-height: 1.1;
-            margin: 0 6px;
+            margin: 0 10px;
         }
-        .fraction .top { border-bottom: 3px solid #6366f1; padding-bottom: 2px; }
-        .fraction .bottom { padding-top: 2px; }
+        .fraction .top { border-bottom: 4px solid #6366f1; padding-bottom: 4px; }
+        .fraction .bottom { padding-top: 4px; }
+        
+        body { user-select: none; -webkit-user-select: none; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen p-2 md:p-6 lg:p-10">
 
     <div class="max-w-[95%] mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
-        <!-- Заголовок -->
         <div class="bg-indigo-600 p-10 text-white text-center">
             <h1 class="text-4xl md:text-5xl font-black mb-4 tracking-tight">Тиск твердих тіл</h1>
             <p class="text-indigo-100 text-xl opacity-95 font-medium italic">Використовуйте "Магічний трикутник" для знаходження невідомої величини</p>
         </div>
 
         <div class="p-6 md:p-12">
-            <!-- Інфо-панель -->
             <div class="flex flex-col lg:flex-row justify-between items-center mb-12 gap-8 bg-indigo-50/70 p-8 rounded-3xl border border-indigo-100">
-                <div class="text-slate-700 font-semibold text-lg">
+                <div class="text-slate-700 font-semibold text-lg text-center lg:text-left">
                     <p>Циклічне тренування: $F \rightarrow S \rightarrow p$</p>
                     <p class="text-sm text-slate-500 mt-2">Підказка: шукайте іконку <span class="inline-flex items-center justify-center w-7 h-7 bg-indigo-600 text-white rounded-full text-sm font-bold shadow-sm">i</span></p>
                 </div>
@@ -118,35 +118,14 @@
                 </button>
             </div>
 
-            <!-- Таблиця -->
             <div class="overflow-x-auto rounded-[2rem] border border-slate-200 shadow-lg">
                 <table class="w-full text-center border-collapse">
                     <thead>
                         <tr class="divide-x divide-slate-200">
-                            <th class="w-1/4">
-                                <div class="header-cell">
-                                    <span class="symbol-text text-3xl">F</span>
-                                    <span class="unit-text text-lg">Н (Сила)</span>
-                                </div>
-                            </th>
-                            <th class="w-1/4">
-                                <div class="header-cell">
-                                    <span class="symbol-text text-3xl">S</span>
-                                    <span class="unit-text text-lg">м² (Площа)</span>
-                                </div>
-                            </th>
-                            <th class="w-1/4">
-                                <div class="header-cell">
-                                    <span class="symbol-text text-3xl">p</span>
-                                    <span class="unit-text text-lg">Па (Тиск)</span>
-                                </div>
-                            </th>
-                            <th class="w-1/4 bg-slate-50">
-                                <div class="header-cell">
-                                    <span class="text-xs font-black tracking-widest text-slate-400 uppercase">Результат</span>
-                                    <span class="text-sm font-bold text-slate-500">ПЕРЕВІРКА</span>
-                                </div>
-                            </th>
+                            <th class="w-1/4"><div class="header-cell"><span class="symbol-text text-3xl">F</span><span class="unit-text text-lg">Н (Сила)</span></div></th>
+                            <th class="w-1/4"><div class="header-cell"><span class="symbol-text text-3xl">S</span><span class="unit-text text-lg">м² (Площа)</span></div></th>
+                            <th class="w-1/4"><div class="header-cell"><span class="symbol-text text-3xl">p</span><span class="unit-text text-lg">Па (Тиск)</span></div></th>
+                            <th class="w-1/4 bg-slate-50"><div class="header-cell"><span class="text-xs font-black tracking-widest text-slate-400 uppercase">Результат</span><span class="text-sm font-bold text-slate-500">ПЕРЕВІРКА</span></div></th>
                         </tr>
                     </thead>
                     <tbody id="exerciseTableBody" class="divide-y divide-slate-100"></tbody>
@@ -155,33 +134,31 @@
         </div>
     </div>
 
-    <!-- Модальне вікно підказки (Збільшене для дошки) -->
-    <div id="hintModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md hidden flex items-center justify-center z-50 p-6">
-        <div class="bg-white rounded-[3rem] shadow-2xl max-w-xl w-full p-12 relative border-4 border-indigo-100">
-            <button onclick="closeHint()" class="absolute top-6 right-6 text-slate-400 hover:text-rose-500 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div id="hintModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-[3rem] shadow-2xl max-w-2xl w-full p-8 md:p-12 relative border-4 border-indigo-100">
+            <button onclick="closeHint()" class="absolute top-6 right-6 text-slate-400 hover:text-rose-500 transition-colors z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
             
-            <h3 class="text-center text-3xl font-black text-slate-800 mb-4">Магічний трикутник</h3>
-            <p class="text-center text-slate-500 text-lg mb-10">Шукана величина пульсує червоним!</p>
+            <h3 class="text-center text-3xl font-black text-slate-800 mb-2">Магічний трикутник</h3>
+            <p class="text-center text-slate-500 text-lg mb-8">Шукана величина пульсує</p>
             
-            <div class="triangle-container scale-125"> <!-- Збільшено масштаб самого трикутника -->
-                <svg class="triangle-svg" viewBox="0 0 100 86">
+            <div class="triangle-container">
+                <svg viewBox="0 0 100 86" class="w-full h-auto drop-shadow-xl">
                     <polygon points="50,5 95,80 5,80" fill="white" stroke="#6366f1" stroke-width="3" />
                     <line x1="28" y1="45" x2="72" y2="45" stroke="#6366f1" stroke-width="2.5" />
-                    <line x1="50" y1="45" x2="50" y2="78" stroke="#6366f1" stroke-width="2.5" />
+                    <line x1="50" y1="45" x2="50" y2="80" stroke="#6366f1" stroke-width="2.5" />
+                    
+                    <!-- Стилі inline для transform-box щоб анімація scale працювала відносно центру символу всередині SVG -->
+                    <text id="svg-F" x="50" y="35" text-anchor="middle" font-size="14" font-weight="900" fill="#1e293b" style="font-family: sans-serif; transform-box: fill-box;">F</text>
+                    <text id="svg-p" x="32" y="68" text-anchor="middle" font-size="14" font-weight="900" fill="#1e293b" style="font-family: sans-serif; transform-box: fill-box;">p</text>
+                    <text id="svg-S" x="68" y="68" text-anchor="middle" font-size="14" font-weight="900" fill="#1e293b" style="font-family: sans-serif; transform-box: fill-box;">S</text>
                 </svg>
-                
-                <div id="hint-F" class="absolute top-[50px] left-1/2 -translate-x-1/2 text-4xl font-black transition-all">F</div>
-                <div id="hint-p" class="absolute top-[135px] left-[75px] text-4xl font-black transition-all">p</div>
-                <div id="hint-S" class="absolute top-[135px] right-[75px] text-4xl font-black transition-all">S</div>
             </div>
 
-            <div class="mt-16 flex justify-center items-center text-indigo-700 font-black text-4xl bg-indigo-50 py-8 rounded-[2rem] border-2 border-indigo-200" id="hint-formula-container">
-                <!-- Формула -->
-            </div>
+            <div class="mt-10 flex justify-center items-center text-indigo-700 font-black text-4xl md:text-5xl bg-indigo-50 py-10 rounded-[2rem] border-2 border-indigo-200" id="hint-formula-container"></div>
         </div>
     </div>
 
@@ -225,25 +202,23 @@
 
         function showHint(hiddenType) {
             const modal = document.getElementById('hintModal');
-            const hints = { F: 'hint-F', p: 'hint-p', S: 'hint-S' };
-            const container = document.getElementById('hint-formula-container');
-
-            Object.values(hints).forEach(id => {
+            const formulaContainer = document.getElementById('hint-formula-container');
+            
+            ['svg-F', 'svg-p', 'svg-S'].forEach(id => {
                 const el = document.getElementById(id);
                 el.classList.remove('blink-element');
-                el.style.color = '#1e293b';
+                el.setAttribute('fill', '#1e293b');
             });
 
-            const activeId = hints[hiddenType];
-            document.getElementById(activeId).classList.add('blink-element');
-            document.getElementById(activeId).style.color = '#ef4444';
+            const activeSvgId = `svg-${hiddenType}`;
+            document.getElementById(activeSvgId).classList.add('blink-element');
 
             if (hiddenType === 'F') {
-                container.innerHTML = '<span>F = p ⋅ S</span>';
+                formulaContainer.innerHTML = '<span>F = p ⋅ S</span>';
             } else if (hiddenType === 'p') {
-                container.innerHTML = '<span>p = </span><div class="fraction"><span class="top">F</span><span class="bottom">S</span></div>';
+                formulaContainer.innerHTML = '<span>p = </span><div class="fraction"><span class="top">F</span><span class="bottom">S</span></div>';
             } else if (hiddenType === 'S') {
-                container.innerHTML = '<span>S = </span><div class="fraction"><span class="top">F</span><span class="bottom">p</span></div>';
+                formulaContainer.innerHTML = '<span>S = </span><div class="fraction"><span class="top">F</span><span class="bottom">p</span></div>';
             }
 
             modal.classList.remove('hidden');
@@ -274,7 +249,7 @@
             
             const createCell = (val, isHidden) => {
                 const td = document.createElement('td');
-                td.className = "p-8 font-black text-slate-800 text-3xl"; // Велика типографіка
+                td.className = "p-8 font-black text-slate-800 text-3xl";
                 if (isHidden) {
                     const wrap = document.createElement('div');
                     wrap.className = "flex items-center gap-4 justify-center";
@@ -295,7 +270,7 @@
 
                     const btn = document.createElement('button');
                     btn.innerHTML = 'i';
-                    btn.className = "w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-black hover:bg-indigo-600 hover:text-white transition-all shadow-md shrink-0 border-2 border-indigo-200";
+                    btn.className = "w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl font-black hover:bg-indigo-600 hover:text-white transition-all shadow-md shrink-0 border-2 border-indigo-200";
                     btn.onclick = () => showHint(task.hidden);
 
                     wrap.appendChild(sel);
