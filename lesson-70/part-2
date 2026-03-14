@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: Тиск твердих тіл (Smart Board Edition)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        th {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0 !important;
+            padding: 0 !important;
+        }
+
+        .header-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 120px; /* Збільшено для дошки */
+            gap: 10px;
+        }
+
+        .symbol-text {
+            font-size: 1.5rem; /* Збільшено */
+            font-weight: 800;
+            color: #1e293b;
+        }
+
+        .unit-text {
+            color: #64748b;
+            font-size: 1rem; /* Збільшено */
+            font-weight: 600;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.2em;
+            padding-right: 2.5rem;
+            font-family: inherit;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+
+        @keyframes wink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.15); color: #ef4444; }
+        }
+        .blink-element {
+            animation: wink 1.5s infinite ease-in-out;
+            font-weight: 900;
+        }
+
+        .triangle-container {
+            position: relative;
+            width: 320px; /* Збільшено для кращої видимості */
+            height: 280px;
+            margin: 20px auto;
+        }
+        .triangle-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 6px 8px rgba(0,0,0,0.15));
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            line-height: 1.1;
+            margin: 0 6px;
+        }
+        .fraction .top { border-bottom: 3px solid #6366f1; padding-bottom: 2px; }
+        .fraction .bottom { padding-top: 2px; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen p-2 md:p-6 lg:p-10">
+
+    <div class="max-w-[95%] mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
+        <!-- Заголовок -->
+        <div class="bg-indigo-600 p-10 text-white text-center">
+            <h1 class="text-4xl md:text-5xl font-black mb-4 tracking-tight">Тиск твердих тіл</h1>
+            <p class="text-indigo-100 text-xl opacity-95 font-medium italic">Використовуйте "Магічний трикутник" для знаходження невідомої величини</p>
+        </div>
+
+        <div class="p-6 md:p-12">
+            <!-- Інфо-панель -->
+            <div class="flex flex-col lg:flex-row justify-between items-center mb-12 gap-8 bg-indigo-50/70 p-8 rounded-3xl border border-indigo-100">
+                <div class="text-slate-700 font-semibold text-lg">
+                    <p>Циклічне тренування: $F \rightarrow S \rightarrow p$</p>
+                    <p class="text-sm text-slate-500 mt-2">Підказка: шукайте іконку <span class="inline-flex items-center justify-center w-7 h-7 bg-indigo-600 text-white rounded-full text-sm font-bold shadow-sm">i</span></p>
+                </div>
+                <button onclick="generateNewTasks()" class="w-full lg:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-2xl font-black py-5 px-16 rounded-2xl transition-all shadow-xl hover:shadow-indigo-200 active:scale-95">
+                    НОВІ ЗАВДАННЯ
+                </button>
+            </div>
+
+            <!-- Таблиця -->
+            <div class="overflow-x-auto rounded-[2rem] border border-slate-200 shadow-lg">
+                <table class="w-full text-center border-collapse">
+                    <thead>
+                        <tr class="divide-x divide-slate-200">
+                            <th class="w-1/4">
+                                <div class="header-cell">
+                                    <span class="symbol-text text-3xl">F</span>
+                                    <span class="unit-text text-lg">Н (Сила)</span>
+                                </div>
+                            </th>
+                            <th class="w-1/4">
+                                <div class="header-cell">
+                                    <span class="symbol-text text-3xl">S</span>
+                                    <span class="unit-text text-lg">м² (Площа)</span>
+                                </div>
+                            </th>
+                            <th class="w-1/4">
+                                <div class="header-cell">
+                                    <span class="symbol-text text-3xl">p</span>
+                                    <span class="unit-text text-lg">Па (Тиск)</span>
+                                </div>
+                            </th>
+                            <th class="w-1/4 bg-slate-50">
+                                <div class="header-cell">
+                                    <span class="text-xs font-black tracking-widest text-slate-400 uppercase">Результат</span>
+                                    <span class="text-sm font-bold text-slate-500">ПЕРЕВІРКА</span>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="exerciseTableBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальне вікно підказки (Збільшене для дошки) -->
+    <div id="hintModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md hidden flex items-center justify-center z-50 p-6">
+        <div class="bg-white rounded-[3rem] shadow-2xl max-w-xl w-full p-12 relative border-4 border-indigo-100">
+            <button onclick="closeHint()" class="absolute top-6 right-6 text-slate-400 hover:text-rose-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            
+            <h3 class="text-center text-3xl font-black text-slate-800 mb-4">Магічний трикутник</h3>
+            <p class="text-center text-slate-500 text-lg mb-10">Шукана величина пульсує червоним!</p>
+            
+            <div class="triangle-container scale-125"> <!-- Збільшено масштаб самого трикутника -->
+                <svg class="triangle-svg" viewBox="0 0 100 86">
+                    <polygon points="50,5 95,80 5,80" fill="white" stroke="#6366f1" stroke-width="3" />
+                    <line x1="28" y1="45" x2="72" y2="45" stroke="#6366f1" stroke-width="2.5" />
+                    <line x1="50" y1="45" x2="50" y2="78" stroke="#6366f1" stroke-width="2.5" />
+                </svg>
+                
+                <div id="hint-F" class="absolute top-[50px] left-1/2 -translate-x-1/2 text-4xl font-black transition-all">F</div>
+                <div id="hint-p" class="absolute top-[135px] left-[75px] text-4xl font-black transition-all">p</div>
+                <div id="hint-S" class="absolute top-[135px] right-[75px] text-4xl font-black transition-all">S</div>
+            </div>
+
+            <div class="mt-16 flex justify-center items-center text-indigo-700 font-black text-4xl bg-indigo-50 py-8 rounded-[2rem] border-2 border-indigo-200" id="hint-formula-container">
+                <!-- Формула -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tasks = [];
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.gain.connect(audioCtx.destination);
+            if (type === 'correct') {
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            } else {
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(120, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            }
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function generateOptions(correctVal) {
+            let options = [correctVal];
+            while(options.length < 4) {
+                let fake;
+                const r = Math.random();
+                if (r < 0.3) fake = correctVal * 2;
+                else if (r < 0.6) fake = Math.round(correctVal / 2);
+                else fake = correctVal + (Math.floor(Math.random() * 20) - 10);
+                if (fake <= 0 || fake === correctVal) fake = correctVal + (Math.floor(Math.random() * 5) + 1);
+                if (!options.some(opt => opt === fake)) options.push(fake);
+            }
+            return options.sort(() => Math.random() - 0.5);
+        }
+
+        function showHint(hiddenType) {
+            const modal = document.getElementById('hintModal');
+            const hints = { F: 'hint-F', p: 'hint-p', S: 'hint-S' };
+            const container = document.getElementById('hint-formula-container');
+
+            Object.values(hints).forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('blink-element');
+                el.style.color = '#1e293b';
+            });
+
+            const activeId = hints[hiddenType];
+            document.getElementById(activeId).classList.add('blink-element');
+            document.getElementById(activeId).style.color = '#ef4444';
+
+            if (hiddenType === 'F') {
+                container.innerHTML = '<span>F = p ⋅ S</span>';
+            } else if (hiddenType === 'p') {
+                container.innerHTML = '<span>p = </span><div class="fraction"><span class="top">F</span><span class="bottom">S</span></div>';
+            } else if (hiddenType === 'S') {
+                container.innerHTML = '<span>S = </span><div class="fraction"><span class="top">F</span><span class="bottom">p</span></div>';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeHint() {
+            document.getElementById('hintModal').classList.add('hidden');
+        }
+
+        function generateNewTasks() {
+            tasks = [];
+            const tableBody = document.getElementById('exerciseTableBody');
+            tableBody.innerHTML = '';
+            const sequence = ['p', 'F', 'S', 'p', 'F', 'S', 'p', 'F', 'S'];
+
+            sequence.forEach((hiddenType, i) => {
+                let S = Math.floor(Math.random() * 8) + 2; 
+                let p = (Math.floor(Math.random() * 25) + 1) * 10;
+                let F = p * S;
+                tasks.push({ F, S, p, hidden: hiddenType });
+                renderRow(tasks[i], i);
+            });
+        }
+
+        function renderRow(task, index) {
+            const row = document.createElement('tr');
+            row.className = "divide-x divide-slate-200 hover:bg-slate-50 transition-all";
+            
+            const createCell = (val, isHidden) => {
+                const td = document.createElement('td');
+                td.className = "p-8 font-black text-slate-800 text-3xl"; // Велика типографіка
+                if (isHidden) {
+                    const wrap = document.createElement('div');
+                    wrap.className = "flex items-center gap-4 justify-center";
+                    
+                    const sel = document.createElement('select');
+                    sel.className = "flex-1 min-w-[140px] p-4 border-2 border-slate-200 rounded-2xl text-center font-black text-indigo-600 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer bg-white shadow-sm text-3xl";
+                    sel.id = `select-${index}`;
+                    const def = document.createElement('option');
+                    def.textContent = "?"; def.value = ""; def.disabled = true; def.selected = true;
+                    sel.appendChild(def);
+                    
+                    generateOptions(val).forEach(opt => {
+                        const o = document.createElement('option');
+                        o.value = opt; o.textContent = opt;
+                        sel.appendChild(o);
+                    });
+                    sel.onchange = () => checkTask(index);
+
+                    const btn = document.createElement('button');
+                    btn.innerHTML = 'i';
+                    btn.className = "w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl font-black hover:bg-indigo-600 hover:text-white transition-all shadow-md shrink-0 border-2 border-indigo-200";
+                    btn.onclick = () => showHint(task.hidden);
+
+                    wrap.appendChild(sel);
+                    wrap.appendChild(btn);
+                    td.appendChild(wrap);
+                } else {
+                    td.textContent = val;
+                }
+                return td;
+            };
+
+            row.appendChild(createCell(task.F, task.hidden === 'F'));
+            row.appendChild(createCell(task.S, task.hidden === 'S'));
+            row.appendChild(createCell(task.p, task.hidden === 'p'));
+
+            const statusTd = document.createElement('td');
+            statusTd.className = "p-8 bg-slate-50/50 font-black text-sm text-slate-300 tracking-[0.2em]";
+            statusTd.id = `status-${index}`;
+            statusTd.textContent = "WAITING";
+            row.appendChild(statusTd);
+            document.getElementById('exerciseTableBody').appendChild(row);
+        }
+
+        function checkTask(index) {
+            const sel = document.getElementById(`select-${index}`);
+            const stat = document.getElementById(`status-${index}`);
+            const userV = parseFloat(sel.value);
+            const task = tasks[index];
+            const correctV = task[task.hidden];
+            
+            if (userV === correctV) {
+                sel.className = "flex-1 p-4 border-4 border-emerald-500 bg-emerald-50 text-emerald-700 rounded-2xl text-center font-black cursor-default shadow-inner text-3xl";
+                stat.textContent = "ВІРНО";
+                stat.className = "p-8 bg-emerald-50 text-emerald-600 font-black text-sm tracking-widest";
+                playSound('correct');
+                sel.disabled = true;
+            } else {
+                sel.className = "flex-1 p-4 border-4 border-rose-400 bg-rose-50 text-rose-700 rounded-2xl text-center font-black animate-shake shadow-md text-3xl";
+                stat.textContent = "ПОМИЛКА";
+                stat.className = "p-8 bg-rose-50 text-rose-500 font-black text-sm tracking-widest";
+                playSound('incorrect');
+                setTimeout(() => { if (!sel.disabled) sel.classList.remove('animate-shake'); }, 400);
+            }
+        }
+
+        window.onload = generateNewTasks;
+    </script>
+</body>
+</html>
