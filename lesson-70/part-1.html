@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
+        * { box-sizing: border-box; }
         .input-focus:focus {
             outline: none;
             border-color: #3b82f6;
@@ -17,42 +18,40 @@
         select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1em; }
         
         .phys-var { font-style: italic; font-family: 'Times New Roman', serif; text-transform: none !important; }
-        .math-display { font-size: 1.5rem; margin: 0.25rem 0; }
+        .math-display { font-size: 1.4rem; margin: 0.25rem 0; }
         
-        /* Запобігання прокрутці на великих екранах */
         body, html {
             overflow: hidden;
             height: 100%;
+            width: 100%;
         }
     </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-900 flex items-center justify-center p-2">
 
-    <div class="w-full h-full max-w-[98vw] max-h-[98vh] bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col">
+    <div class="w-full h-full max-w-[99vw] max-h-[99vh] bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col">
         
-        <!-- Заголовок (компактний) -->
-        <div class="bg-blue-800 py-3 px-6 flex justify-between items-center shrink-0">
-            <h1 class="text-xl font-bold text-white">Задача: Тиск аркуша паперу</h1>
+        <!-- Заголовок -->
+        <div class="bg-blue-800 py-2 px-6 flex justify-between items-center shrink-0">
+            <h1 class="text-xl font-bold text-white uppercase tracking-tight">Задача: Тиск аркуша паперу</h1>
             <div class="bg-blue-700 px-4 py-1 rounded-full text-blue-100 text-sm font-bold border border-blue-500">
                 Прийміть <span class="phys-var">g</span> = 10 Н/кг
             </div>
         </div>
 
-        <!-- Основний контент (трьохколонковий) -->
-        <div class="flex-1 p-4 grid grid-cols-3 gap-4 overflow-hidden">
+        <!-- Основний контент -->
+        <div class="flex-1 p-3 grid grid-cols-3 gap-3 overflow-hidden">
             
             <!-- Крок 1: Геометрія -->
-            <div class="flex flex-col gap-3 bg-blue-50/50 p-4 rounded-2xl border border-blue-100 overflow-y-auto">
+            <div class="flex flex-col gap-2 bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
                 <h3 class="font-bold text-lg flex items-center gap-2 text-blue-800 shrink-0">
                     <span class="w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-mono">1</span>
                     Геометрія
                 </h3>
                 
-                <div class="space-y-3">
-                    <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
-                        <label class="block text-[10px] uppercase text-slate-500 mb-1 font-bold tracking-wider">
-                            довжина <span class="phys-var">l</span> (м)
-                        </label>
+                <div class="space-y-2 flex-1 flex flex-col justify-center">
+                    <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-sm">
+                        <label class="block text-[10px] uppercase text-slate-500 mb-1 font-bold">довжина <span class="phys-var">l</span> (м)</label>
                         <select id="input-l" class="w-full p-2 rounded-lg border input-focus font-mono text-lg">
                             <option value="">Оберіть...</option>
                             <option value="2.97">2.97</option>
@@ -61,10 +60,8 @@
                         </select>
                     </div>
 
-                    <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
-                        <label class="block text-[10px] uppercase text-slate-500 mb-1 font-bold tracking-wider">
-                            ширина <span class="phys-var">d</span> (м)
-                        </label>
+                    <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-sm">
+                        <label class="block text-[10px] uppercase text-slate-500 mb-1 font-bold">ширина <span class="phys-var">d</span> (м)</label>
                         <select id="input-d" class="w-full p-2 rounded-lg border input-focus font-mono text-lg">
                             <option value="">Оберіть...</option>
                             <option value="2.1">2.1</option>
@@ -73,10 +70,10 @@
                         </select>
                     </div>
 
-                    <div class="mt-4 p-4 bg-blue-100 rounded-xl border border-blue-300 text-center">
+                    <div class="mt-2 p-3 bg-blue-100 rounded-xl border border-blue-300 text-center">
                         <div class="math-display">\( S = l \cdot d \)</div>
-                        <label class="block text-xs font-bold text-blue-900 mb-2">Обчислена площа <span class="phys-var">S</span> (м²):</label>
-                        <select id="input-s" class="w-full p-3 rounded-lg border border-blue-400 input-focus text-center font-bold text-blue-800 bg-white text-lg">
+                        <label class="block text-[10px] font-bold text-blue-900 mb-1 uppercase">Площа <span class="phys-var">S</span> (м²):</label>
+                        <select id="input-s" class="w-full p-2 rounded-lg border border-blue-400 input-focus text-center font-bold text-blue-800 bg-white text-lg">
                             <option value="">Оберіть...</option>
                             <option value="0.6237">0.6237</option>
                             <option value="0.06237">0.06237</option>
@@ -87,58 +84,54 @@
             </div>
 
             <!-- Крок 2: Вага -->
-            <div class="flex flex-col gap-3 bg-red-50/50 p-4 rounded-2xl border border-red-100 overflow-y-auto">
+            <div class="flex flex-col gap-2 bg-red-50/50 p-4 rounded-2xl border border-red-100">
                 <h3 class="font-bold text-lg flex items-center gap-2 text-red-800 shrink-0">
                     <span class="w-7 h-7 bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-mono">2</span>
                     Вага
                 </h3>
 
-                <div class="space-y-3">
-                    <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
-                        <label class="block text-[10px] uppercase text-slate-500 mb-1 font-bold tracking-wider">
-                            маса <span class="phys-var text-red-600">m</span> (г)
-                        </label>
+                <div class="space-y-2 flex-1 flex flex-col justify-center">
+                    <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-sm">
+                        <label class="block text-[10px] uppercase text-slate-500 mb-1 font-bold">маса <span class="phys-var text-red-600">m</span> (г)</label>
                         <input type="number" step="0.1" placeholder="г" id="input-m-grams" class="w-full p-2 rounded-lg border input-focus font-mono text-lg">
                     </div>
 
-                    <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
-                        <label class="block text-[10px] uppercase text-slate-500 mb-1 font-bold tracking-wider">
-                            маса <span class="phys-var text-red-600">m</span> (кг)
-                        </label>
+                    <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-sm">
+                        <label class="block text-[10px] uppercase text-slate-500 mb-1 font-bold">маса <span class="phys-var text-red-600">m</span> (кг)</label>
                         <input type="number" step="0.0001" placeholder="кг" id="input-m-kg" class="w-full p-2 rounded-lg border input-focus font-mono text-lg">
                     </div>
 
-                    <div class="mt-4 p-4 bg-red-100 rounded-xl border border-red-300 text-center">
+                    <div class="mt-2 p-3 bg-red-100 rounded-xl border border-red-300 text-center">
                         <div class="math-display">\( P = m \cdot g \)</div>
-                        <label class="block text-xs font-bold text-red-900 mb-2">Вага аркуша (Н):</label>
-                        <input type="number" step="0.0001" id="input-p-weight" class="w-full p-3 rounded-lg border border-red-400 input-focus text-center font-bold text-red-800 text-lg">
+                        <label class="block text-[10px] font-bold text-red-900 mb-1 uppercase">Вага <span class="phys-var text-red-600">P</span> (Н):</label>
+                        <input type="number" step="0.0001" id="input-p-weight" class="w-full p-2 rounded-lg border border-red-400 input-focus text-center font-bold text-red-800 text-lg">
                     </div>
                 </div>
             </div>
 
             <!-- Крок 3: Тиск -->
-            <div class="flex flex-col gap-3 bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100 overflow-y-auto">
+            <div class="flex flex-col gap-2 bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100 relative">
                 <h3 class="font-bold text-lg flex items-center gap-2 text-emerald-800 shrink-0">
                     <span class="w-7 h-7 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-mono">3</span>
                     Тиск
                 </h3>
 
                 <div class="flex-1 flex flex-col justify-center">
-                    <div class="bg-white p-6 rounded-2xl border-2 border-emerald-500 flex flex-col items-center shadow-md">
-                        <div class="math-display mb-6">\( p = \frac{P}{S} \)</div>
-                        <div class="flex items-center gap-3 w-full">
-                            <input type="number" step="0.001" placeholder="Результат" id="input-p-pressure" class="flex-1 p-4 rounded-xl border-2 border-emerald-300 input-focus text-center text-3xl font-black text-emerald-800">
-                            <span class="text-xl font-bold text-emerald-700">Па</span>
+                    <div class="bg-white p-4 rounded-2xl border-2 border-emerald-500 flex flex-col items-center shadow-md w-full overflow-hidden">
+                        <div class="math-display mb-2">\( p = \frac{P}{S} \)</div>
+                        <div class="flex items-center gap-2 w-full px-2">
+                            <input type="number" step="0.001" placeholder="---" id="input-p-pressure" class="w-full min-w-0 p-3 rounded-xl border-2 border-emerald-300 input-focus text-center text-2xl font-black text-emerald-800">
+                            <span class="text-lg font-bold text-emerald-700 shrink-0">Па</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-auto pt-4">
+                <div class="mt-auto">
                     <button onclick="checkAllAnswers()" class="w-full py-4 bg-blue-700 hover:bg-blue-800 text-white rounded-2xl font-bold text-xl shadow-lg transition-all active:scale-95">
                         ПЕРЕВІРИТИ
                     </button>
-                    <!-- Результат -->
-                    <div id="result-box" class="hidden mt-3 p-3 rounded-xl text-center font-bold text-sm leading-tight border"></div>
+                    <!-- Результат (фіксована висота щоб не стрибало) -->
+                    <div id="result-box" class="hidden mt-2 p-2 rounded-xl text-center font-bold text-sm border min-h-[40px] flex items-center justify-center"></div>
                 </div>
             </div>
 
@@ -167,43 +160,31 @@
             if (!isNaN(l) && !isNaN(d)) {
                 const targetS = l * d;
                 errors += markField('input-s', s, targetS, 0.0001);
-            } else { 
-                errors++; 
-                markField('input-s', -1, 0); 
-            }
+            } else { errors++; markField('input-s', -1, 0); }
 
             if (!isNaN(mGrams)) {
                 const targetKg = mGrams / 1000;
                 errors += markField('input-m-kg', mKg, targetKg, 0.00001);
-            } else { 
-                errors++; 
-                markField('input-m-kg', -1, 0); 
-            }
+            } else { errors++; markField('input-m-kg', -1, 0); }
 
             if (!isNaN(mKg)) {
                 const targetPWeight = mKg * G_CONST;
                 errors += markField('input-p-weight', pWeight, targetPWeight, 0.0001);
-            } else { 
-                errors++; 
-                markField('input-p-weight', -1, 0); 
-            }
+            } else { errors++; markField('input-p-weight', -1, 0); }
 
             if (!isNaN(pWeight) && !isNaN(s) && s !== 0) {
                 const targetPPressure = pWeight / s;
                 errors += markField('input-p-pressure', pPressure, targetPPressure, 0.01);
-            } else { 
-                errors++; 
-                markField('input-p-pressure', -1, 0); 
-            }
+            } else { errors++; markField('input-p-pressure', -1, 0); }
 
             const resultBox = document.getElementById('result-box');
             resultBox.classList.remove('hidden');
 
             if (errors === 0) {
-                resultBox.className = "mt-3 p-3 rounded-xl text-center font-bold bg-green-100 text-green-700 block border border-green-200 shadow-sm";
+                resultBox.className = "mt-2 p-2 rounded-xl text-center font-bold bg-green-100 text-green-700 block border border-green-200 shadow-sm flex items-center justify-center";
                 resultBox.innerText = "ВІРНО! 🎉";
             } else {
-                resultBox.className = "mt-3 p-3 rounded-xl text-center font-bold bg-red-100 text-red-700 block border border-red-200 shadow-sm";
+                resultBox.className = "mt-2 p-2 rounded-xl text-center font-bold bg-red-100 text-red-700 block border border-red-200 shadow-sm flex items-center justify-center";
                 resultBox.innerText = `ПОМИЛОК: ${errors}`;
             }
         }
