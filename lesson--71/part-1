@@ -1,1 +1,284 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задача 71.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: { enableMenu: false },
+            startup: {
+                pageReady: () => {
+                    return MathJax.startup.defaultPageReady().then(() => {
+                        document.body.classList.add('mathjax-ready');
+                        if (typeof updateUI === 'function') updateUI();
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: "Cambria Math", "Cambria", "Times New Roman", serif;
+            background-color: #ffffff;
+            color: #000000;
+            font-size: 24px;
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            touch-action: pan-y;
+            overflow-x: hidden;
+        }
 
+        .task-header {
+            width: 95%;
+            max-width: 1200px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 15px;
+        }
+
+        .task-title {
+            font-weight: bold;
+            font-size: 28px;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        .task-text {
+            /* Прибрано font-style: italic */
+            font-size: 22px;
+            color: #374151;
+        }
+
+        .step {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .step.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .physics-table {
+            display: table;
+            width: 95%;
+            max-width: 1200px;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+
+        .row {
+            display: table-row;
+        }
+
+        .cell {
+            display: table-cell;
+            vertical-align: top;
+            padding: 10px 15px;
+        }
+
+        .header-cell {
+            font-weight: bold;
+            font-size: 24px; 
+            padding-bottom: 20px;
+        }
+
+        .v-line {
+            border-right: 2.5px solid black;
+        }
+
+        .h-line-dano {
+            border-top: 2.5px solid black;
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .nav-arrow.left { left: 5px; }
+        .nav-arrow.right { right: 5px; }
+
+        .answer-container {
+            white-space: nowrap;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 24px;
+            text-align: left;
+        }
+        
+        .mjx-chtml {
+            font-size: 100% !important;
+        }
+
+        @media (max-width: 768px) {
+            body { font-size: 18px; }
+            .task-title { font-size: 22px; }
+            .task-text { font-size: 18px; }
+            .header-cell { font-size: 18px; }
+            .answer-container { font-size: 18px; }
+            .physics-table { width: 100%; }
+            .cell { padding: 5px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="prev-btn" class="nav-arrow left"><span class="text-4xl text-gray-600">‹</span></div>
+    <div id="next-btn" class="nav-arrow right"><span class="text-4xl text-gray-600">›</span></div>
+
+    <!-- Шапка вправи -->
+    <div class="task-header">
+        <div class="task-title">Задача 71.1</div>
+        <div class="task-text">
+            Кіт Мурчик вирішив прогулятися по замерзлому озеру, вкритому тонким льодом. Маса Мурчика разом із теплим шарфиком становить 5 кг. Площа однієї лапки кота приблизно дорівнює 10 см². Який тиск чинить Мурчик на лід, коли він стоїть на всіх чотирьох лапах?
+        </div>
+    </div>
+
+    <div id="main-container" class="physics-table">
+        <div class="row">
+            <!-- Колонка 1: Дано -->
+            <div class="cell v-line w-[25%]">
+                <div class="header-cell">Дано:</div>
+                <div class="space-y-4">
+                    <div class="step" id="step-1">$m = 5 \, \text{кг}$</div>
+                    <div class="step" id="step-2">$S_1 = 10 \, \text{см}^2$</div>
+                    <div class="step" id="step-3">$N = 4$</div>
+                    <div class="h-line-dano step" id="step-6">
+                        $p - ?$
+                    </div>
+                </div>
+            </div>
+
+            <!-- Колонка 2: СІ -->
+            <div class="cell v-line w-[15%] text-center">
+                <div class="header-cell">СІ</div>
+                <div class="space-y-4">
+                    <div class="step" id="step-4">—</div>
+                    <div class="step" id="step-5">$0,001 \, \text{м}^2$</div>
+                    <div class="step" id="step-4">—</div>
+                </div>
+            </div>
+
+            <!-- Колонка 3: Розв'язання -->
+            <div class="cell v-line w-[30%]">
+                <div class="header-cell text-center">Розв'язання</div>
+                <div class="flex flex-col items-center space-y-6 mt-4">
+                    <div class="step" id="step-7">
+                        $p = \dfrac{F}{S}$
+                    </div>
+                    <div class="step" id="step-8">
+                        $F = mg$
+                    </div>
+                    <div class="step" id="step-9">
+                        $S = N \cdot S_1$
+                    </div>
+                    <div class="step text-blue-800 font-bold" id="step-10">
+                        $p = \dfrac{mg}{N \cdot S_1}$
+                    </div>
+                </div>
+            </div>
+
+            <!-- Колонка 4: Обчислення -->
+            <div class="cell w-[30%]">
+                <div class="header-cell text-center">&nbsp;</div>
+                <div class="flex flex-col space-y-8 mt-4 items-center">
+                    <div class="step" id="step-11">
+                        $$ [p] = \frac{\text{кг} \cdot \frac{\text{Н}}{\text{кг}}}{\text{м}^2} = \text{Па} $$
+                    </div>
+                    <div class="step" id="step-12">
+                        $$ p = \frac{5 \cdot 10}{4 \cdot 0,001} = \frac{50}{0,004} $$
+                    </div>
+                    <div class="step" id="step-13">
+                        $$ p = 12 \, 500 \, (\text{Па}) = 12,5 \, (\text{кПа}) $$
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Рядок для Відповіді -->
+        <div class="row">
+            <div class="cell" colspan="4">
+                <div class="step mt-16 text-left pl-4" id="step-14">
+                    <div class="answer-container">
+                        Відповідь: 12,5 кПа
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-4 right-6 text-gray-400 text-xs bg-white/80 p-1 rounded">
+        Крок <span id="step-counter">0</span> / 14
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const totalSteps = 14;
+
+        function updateUI() {
+            for (let i = 1; i <= totalSteps; i++) {
+                const el = document.getElementById(`step-${i}`);
+                if (el) {
+                    if (i <= currentStep) el.classList.add('visible');
+                    else el.classList.remove('visible');
+                }
+            }
+            document.getElementById('step-counter').innerText = currentStep;
+            document.getElementById('prev-btn').style.visibility = currentStep === 0 ? "hidden" : "visible";
+            document.getElementById('next-btn').style.opacity = currentStep === totalSteps ? "0.3" : "1";
+
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                window.MathJax.typesetPromise();
+            }
+        }
+
+        const next = () => { if (currentStep < totalSteps) { currentStep++; updateUI(); } };
+        const prev = () => { if (currentStep > 0) { currentStep--; updateUI(); } };
+
+        document.getElementById('next-btn').onclick = next;
+        document.getElementById('prev-btn').onclick = prev;
+
+        let touchstartX = 0;
+        let touchendX = 0;
+        function handleGesture() {
+            if (touchendX < touchstartX - 50) next();
+            if (touchendX > touchstartX + 50) prev();
+        }
+        document.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; });
+        document.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleGesture(); });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'ArrowRight' || e.code === 'Space') next();
+            if (e.code === 'ArrowLeft') prev();
+        });
+
+        window.onload = updateUI;
+    </script>
+</body>
+</html>
