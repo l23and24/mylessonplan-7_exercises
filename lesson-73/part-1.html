@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: №73.1 Гідравлічний прес</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+        
+        body { 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh;
+        }
+
+        .cambria-font { font-family: 'Cambria', 'Noto Sans', serif; }
+
+        .bg-blob {
+            position: fixed;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(5vw, 5vh); }
+        }
+
+        .fade-in-row {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        select { text-align-last: center; cursor: pointer; }
+        sub { font-size: 0.6em; vertical-align: sub; }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-blob" style="top: -10vw; left: -10vw;"></div>
+    <div class="bg-blob" style="bottom: -10vw; right: -10vw; animation-delay: -5s;"></div>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const CheckCircle2 = () => <i data-lucide="check-circle-2" className="text-green-500 w-6 h-6"></i>;
+        const XCircle = () => <i data-lucide="x-circle" className="text-red-400 w-6 h-6"></i>;
+        const RefreshCcw = () => <i data-lucide="refresh-ccw" className="w-4 h-4"></i>;
+        const Info = () => <i data-lucide="info" className="w-5 h-5"></i>;
+        const X = () => <i data-lucide="x" className="w-6 h-6"></i>;
+
+        const formatNum = (num) => {
+            if (num === "" || num === undefined) return "";
+            return num.toString().replace('.', ',');
+        };
+
+        const App = () => {
+            const initialTasks = [
+                { id: 4, f1: "", s1: "4", f2: "1200", s2: "40", target: "f1", correct: 120, uF: "Н", uS: "см²", uRes: "Н", opt: [120, 12, 480, 240] },
+                { id: 1, f1: "100", s1: "2", f2: "", s2: "20", target: "f2", correct: 1000, uF: "Н", uS: "см²", uRes: "Н", opt: [1000, 500, 2000, 10] },
+                { id: 7, f1: "20", s1: "", f2: "200", s2: "50", target: "s1", correct: 5, uF: "Н", uS: "см²", uRes: "см²", opt: [5, 50, 0.5, 10] },
+                { id: 8, f1: "30", s1: "6", f2: "150", s2: "", target: "s2", correct: 30, uF: "Н", uS: "см²", uRes: "см²", opt: [30, 60, 15, 3] },
+                { id: 5, f1: "", s1: "2.5", f2: "10", s2: "25", target: "f1", correct: 1, uF: "кН", uS: "см²", uRes: "кН", opt: [1, 10, 0.1, 2.5] },
+                { id: 2, f1: "50", s1: "10", f2: "", s2: "100", target: "f2", correct: 500, uF: "Н", uS: "см²", uRes: "Н", opt: [500, 50, 5000, 100] },
+                { id: 10, f1: "40", s1: "", f2: "400", s2: "80", target: "s1", correct: 8, uF: "Н", uS: "см²", uRes: "см²", opt: [8, 80, 4, 16] },
+                { id: 9, f1: "0.5", s1: "10", f2: "2.5", s2: "", target: "s2", correct: 50, uF: "кН", uS: "см²", uRes: "см²", opt: [50, 25, 100, 5] },
+                { id: 6, f1: "", s1: "8", f2: "1600", s2: "80", target: "f1", correct: 160, uF: "Н", uS: "см²", uRes: "Н", opt: [160, 16, 320, 80] }
+            ];
+
+            const [tasks, setTasks] = useState([]);
+            const [userInputs, setUserInputs] = useState({});
+            const [results, setResults] = useState({});
+            const [showHint, setShowHint] = useState(false);
+            const audioCtx = useRef(null);
+
+            useEffect(() => {
+                prepareTasks();
+            }, []);
+
+            useEffect(() => {
+                if (window.lucide) window.lucide.createIcons();
+            }, [tasks, results, showHint]);
+
+            const prepareTasks = () => {
+                const ordered = initialTasks.map(t => ({
+                    ...t,
+                    opt: [...t.opt].sort(() => Math.random() - 0.5)
+                }));
+                setTasks(ordered);
+            };
+
+            const playSound = (type) => {
+                if (!audioCtx.current) audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.current.createOscillator();
+                const gain = audioCtx.current.createGain();
+                osc.connect(gain); gain.connect(audioCtx.current.destination);
+                osc.frequency.setValueAtTime(type === 'success' ? 880 : 220, audioCtx.current.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.current.currentTime);
+                osc.start(); osc.stop(audioCtx.current.currentTime + 0.1);
+            };
+
+            const handleSelect = (id, val) => {
+                if (!val) return;
+                setUserInputs(prev => ({ ...prev, [id]: val }));
+                const task = tasks.find(t => t.id === id);
+                if (parseFloat(val) === task.correct) {
+                    playSound('success'); setResults(prev => ({ ...prev, [id]: 'correct' }));
+                } else {
+                    playSound('error'); setResults(prev => ({ ...prev, [id]: 'wrong' }));
+                }
+            };
+
+            const DisplayValue = ({ val, unit }) => (
+                <div className="flex items-baseline justify-center gap-1.5 whitespace-nowrap">
+                    <span className="text-xl md:text-2xl font-bold text-slate-700">{formatNum(val)}</span>
+                    <span className="text-base md:text-lg font-bold text-slate-400">{unit}</span>
+                </div>
+            );
+
+            const FormulaModal = () => (
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-50 flex items-center justify-center p-4" onClick={() => setShowHint(false)}>
+                    <div className="bg-white rounded-[2rem] p-6 md:p-10 shadow-2xl relative max-w-md w-full border border-slate-100" onClick={e => e.stopPropagation()}>
+                        <button className="absolute top-4 right-4 text-slate-300 hover:text-red-500" onClick={() => setShowHint(false)}><X /></button>
+                        <div className="flex flex-col items-center">
+                            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4">
+                                <i data-lucide="help-circle" className="text-blue-500 w-6 h-6"></i>
+                            </div>
+                            <h3 className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-6 text-center">Математична модель</h3>
+                            <div className="text-3xl md:text-5xl cambria-font font-bold text-slate-800 flex items-center gap-4 mb-8">
+                                <div className="flex flex-col items-center">
+                                    <span className="border-b-2 border-slate-800 pb-1">F<sub>2</sub></span>
+                                    <span className="pt-1">F<sub>1</sub></span>
+                                </div>
+                                <span>=</span>
+                                <div className="flex flex-col items-center">
+                                    <span className="border-b-2 border-slate-800 pb-1">S<sub>2</sub></span>
+                                    <span className="pt-1">S<sub>1</sub></span>
+                                </div>
+                            </div>
+                            <div className="bg-blue-50/50 p-4 rounded-2xl text-center">
+                                <p className="text-blue-700 text-xs md:text-sm italic font-medium leading-relaxed">
+                                    "Виграш у силі дорівнює відношенню площ поршнів"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="w-full min-h-screen py-6 md:py-10 px-2 md:px-4 flex justify-center items-start cambria-font">
+                    {showHint && <FormulaModal />}
+                    <div className="w-full max-w-7xl space-y-6">
+                        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-end gap-4 px-2">
+                            <div className="text-center sm:text-left">
+                                <h1 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tight">№73.1 Гідравлічний прес</h1>
+                                <p className="text-slate-500 text-xs md:text-base">Знайдіть невідому величину для рівноваги</p>
+                            </div>
+                            <button onClick={() => setShowHint(true)} className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm border border-slate-200 text-slate-600 hover:text-blue-600 transition-all active:scale-95">
+                                <Info /> <span className="text-[10px] font-bold uppercase tracking-wider">Підказка</span>
+                            </button>
+                        </div>
+                        <div className="bg-white/80 backdrop-blur-sm border border-white rounded-xl md:rounded-[2rem] shadow-xl table-container">
+                            <table className="w-full min-w-[700px] text-center border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50/50">
+                                        <th colSpan="2" className="py-3 text-[9px] font-black text-blue-500 uppercase tracking-widest border-b border-slate-100">Малий поршень (1)</th>
+                                        <th colSpan="2" className="py-3 text-[9px] font-black text-red-500 uppercase tracking-widest border-b border-slate-100">Великий поршень (2)</th>
+                                        <th rowSpan="2" className="w-16 md:w-24 border-b border-slate-100"></th>
+                                    </tr>
+                                    <tr className="bg-white/50 text-slate-400">
+                                        <th className="py-2 text-[10px] font-bold uppercase">Сила F₁</th>
+                                        <th className="py-2 text-[10px] font-bold uppercase">Площа S₁</th>
+                                        <th className="py-2 text-[10px] font-bold uppercase border-l border-slate-50">Сила F₂</th>
+                                        <th className="py-2 text-[10px] font-bold uppercase">Площа S₂</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {tasks.map((t, idx) => (
+                                        <tr key={t.id} className="fade-in-row hover:bg-white transition-colors" style={{animationDelay: `${idx * 0.05}s`}}>
+                                            <td className="p-4 md:p-8">
+                                                {t.target === 'f1' ? (
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <select onChange={(e) => handleSelect(t.id, e.target.value)} value={userInputs[t.id] || ''} 
+                                                            className={`w-20 md:w-32 border-2 rounded-lg py-2 px-1 font-bold text-center transition-all ${results[t.id] === 'correct' ? 'bg-green-500 border-green-500 text-white' : results[t.id] === 'wrong' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-white border-slate-100 hover:border-blue-200'}`}>
+                                                            <option value="">?</option>{t.opt.map(o => <option key={o} value={o}>{formatNum(o)}</option>)}
+                                                        </select>
+                                                        <span className="text-xs font-bold text-slate-400">{t.uRes}</span>
+                                                    </div>
+                                                ) : <DisplayValue val={t.f1} unit={t.uF} />}
+                                            </td>
+                                            <td className="p-4 md:p-8">
+                                                {t.target === 's1' ? (
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <select onChange={(e) => handleSelect(t.id, e.target.value)} value={userInputs[t.id] || ''} 
+                                                            className={`w-20 md:w-32 border-2 rounded-lg py-2 px-1 font-bold text-center transition-all ${results[t.id] === 'correct' ? 'bg-green-500 border-green-500 text-white' : results[t.id] === 'wrong' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-white border-slate-100 hover:border-blue-200'}`}>
+                                                            <option value="">?</option>{t.opt.map(o => <option key={o} value={o}>{formatNum(o)}</option>)}
+                                                        </select>
+                                                        <span className="text-xs font-bold text-slate-400">{t.uRes}</span>
+                                                    </div>
+                                                ) : <DisplayValue val={t.s1} unit={t.uS} />}
+                                            </td>
+                                            <td className="p-4 md:p-8 border-l border-slate-50">
+                                                {t.target === 'f2' ? (
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <select onChange={(e) => handleSelect(t.id, e.target.value)} value={userInputs[t.id] || ''} 
+                                                            className={`w-20 md:w-32 border-2 rounded-lg py-2 px-1 font-bold text-center transition-all ${results[t.id] === 'correct' ? 'bg-green-500 border-green-500 text-white' : results[t.id] === 'wrong' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-white border-slate-100 hover:border-blue-200'}`}>
+                                                            <option value="">?</option>{t.opt.map(o => <option key={o} value={o}>{formatNum(o)}</option>)}
+                                                        </select>
+                                                        <span className="text-xs font-bold text-slate-400">{t.uRes}</span>
+                                                    </div>
+                                                ) : <DisplayValue val={t.f2} unit={t.uF} />}
+                                            </td>
+                                            <td className="p-4 md:p-8">
+                                                {t.target === 's2' ? (
+                                                    <div className="flex items-center justify-center gap-1">
+                                                        <select onChange={(e) => handleSelect(t.id, e.target.value)} value={userInputs[t.id] || ''} 
+                                                            className={`w-20 md:w-32 border-2 rounded-lg py-2 px-1 font-bold text-center transition-all ${results[t.id] === 'correct' ? 'bg-green-500 border-green-500 text-white' : results[t.id] === 'wrong' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-white border-slate-100 hover:border-blue-200'}`}>
+                                                            <option value="">?</option>{t.opt.map(o => <option key={o} value={o}>{formatNum(o)}</option>)}
+                                                        </select>
+                                                        <span className="text-xs font-bold text-slate-400">{t.uRes}</span>
+                                                    </div>
+                                                ) : <DisplayValue val={t.s2} unit={t.uS} />}
+                                            </td>
+                                            <td className="p-2 md:p-4">
+                                                <div className="flex items-center justify-center">
+                                                    {results[t.id] === 'correct' ? <CheckCircle2 /> : results[t.id] === 'wrong' ? <XCircle /> : <div className="w-5 h-5 rounded-full border-2 border-dashed border-slate-200"></div>}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="flex justify-center py-4">
+                            <button onClick={() => { setUserInputs({}); setResults({}); prepareTasks(); }} className="flex items-center gap-3 px-6 py-3 bg-slate-800 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg">
+                                <RefreshCcw /> Новий набір задач
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
