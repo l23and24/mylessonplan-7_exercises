@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гідравлічний прес — Інтерактивний конспект</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        /* Примусове вимкнення курсиву для MathJax, щоб h не була схожа на H */
+        .mjx-i { font-style: normal !important; }
+       
+        .piston-container {
+            transition: bottom 0.05s linear, width 0.3s ease-in-out;
+            will-change: bottom, width;
+        }
+       
+        .cylinder {
+            transition: width 0.3s ease-in-out;
+        }
+
+        .formula-card {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .formula-card:hover {
+            transform: translateY(-2px);
+            background-color: #f0f7ff;
+        }
+        
+        .formula-card.active {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 2px #2563eb;
+        }
+
+        /* Стилізація слайдерів для мобільних пристроїв */
+        input[type=range] {
+            height: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-2 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">
+        <header class="bg-blue-600 p-6 text-white text-center">
+            <h1 class="text-2xl md:text-3xl font-bold uppercase tracking-wide">Гідравлічний прес</h1>
+            <p class="text-blue-100 mt-2 text-sm md:text-base">Опорний конспект з фізики (7 клас)</p>
+        </header>
+
+        <main class="p-4 md:p-8 space-y-10">
+           
+            <!-- Розділ 1: Визначення -->
+            <section>
+                <h2 class="text-xl md:text-2xl font-semibold border-b-2 border-blue-200 pb-2 mb-4">1. Визначення та будова</h2>
+                <div class="bg-blue-50 p-4 rounded-lg text-base md:text-lg border-l-4 border-blue-500 mb-4">
+                    <strong>Гідравлічний прес</strong> — це машина, що дозволяє за допомогою невеликої сили отримати значно більшу силу для підйому або стиснення тіл.
+                </div>
+                <p class="text-base md:text-lg">
+                    Він складається з двох сполучених циліндрів різної площі, заповнених рідиною. 
+                    <strong>Напрямки сил:</strong> \(F_1\) вниз (вхідна дія), \(F_2\) вгору (результат).
+                </p>
+            </section>
+
+            <!-- Розділ 2: Формули -->
+            <section class="bg-gray-50 p-4 md:p-6 rounded-xl border border-gray-200">
+                <h2 class="text-xl md:text-2xl font-semibold border-b-2 border-blue-200 pb-2 mb-6">2. Виграш у силі та пропорція</h2>
+                <div class="space-y-6 text-base md:text-lg leading-relaxed">
+                    <p>Згідно із <strong>законом Паскаля</strong>, тиск усередині рідини однаковий. Основна пропорція:</p>
+                   
+                    <div class="flex justify-center">
+                        <div class="bg-blue-600 p-4 md:p-6 rounded-xl shadow-md text-center font-bold text-2xl md:text-3xl text-white">
+                            \[\frac{F_2}{F_1} = \frac{S_2}{S_1}\]
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 md:p-6 rounded-xl border-2 border-dashed border-blue-200">
+                        <p class="text-center font-bold text-blue-800 mb-4 uppercase text-xs md:text-sm tracking-widest">Тренажер формул (оберіть невідоме):</p>
+                        <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-6">
+                            <button onclick="showFormula('f2', this)" class="formula-card px-3 py-2 border rounded-lg font-bold text-blue-600 text-sm md:text-base active">\(F_2\)</button>
+                            <button onclick="showFormula('f1', this)" class="formula-card px-3 py-2 border rounded-lg font-bold text-blue-600 text-sm md:text-base">\(F_1\)</button>
+                            <button onclick="showFormula('s2', this)" class="formula-card px-3 py-2 border rounded-lg font-bold text-blue-600 text-sm md:text-base">\(S_2\)</button>
+                            <button onclick="showFormula('s1', this)" class="formula-card px-3 py-2 border rounded-lg font-bold text-blue-600 text-sm md:text-base">\(S_1\)</button>
+                        </div>
+                        <div id="formula-display" class="bg-blue-50 p-4 md:p-6 rounded-lg text-center min-h-[100px] flex items-center justify-center border border-blue-100">
+                            <div class="text-xl md:text-2xl font-bold text-blue-900" id="math-output">
+                                \[F_2 = \frac{F_1 \cdot S_2}{S_1}\]
+                            </div>
+                        </div>
+                        <p class="text-center text-[10px] md:text-xs text-gray-400 mt-4 uppercase tracking-tighter">Порада: використовуйте правило "хреста" — перемножуйте відомі по діагоналі й діліть на третє число.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Розділ 3: Інтерактивна модель -->
+            <section>
+                <h2 class="text-xl md:text-2xl font-semibold border-b-2 border-blue-200 pb-2 mb-4">3. Дослідження: Як площа впливає на силу та хід</h2>
+               
+                <div class="bg-white border-2 border-blue-100 p-4 md:p-8 rounded-2xl shadow-sm">
+                    <!-- Сцена симуляції -->
+                    <div class="flex items-end justify-center h-64 md:h-80 gap-0 relative overflow-hidden bg-slate-50 rounded-lg border mb-6">
+                       
+                        <!-- Малий циліндр -->
+                        <div class="w-12 bg-white border-x-4 border-b-4 border-gray-400 relative" style="height: 240px;">
+                            <div id="piston-1" class="piston-container absolute left-0 right-0 z-20" style="bottom: 120px;">
+                                <div class="bg-gray-800 h-4 w-full border-b-2 border-black"></div>
+                            </div>
+                            <div class="absolute bottom-0 w-full bg-blue-400 opacity-60" id="fluid-1" style="height: 120px;"></div>
+                        </div>
+                       
+                        <!-- Канал -->
+                        <div class="h-10 bg-blue-400 opacity-60 border-y-4 border-gray-400" style="width: 40px; md:width: 60px;"></div>
+
+                        <!-- Великий циліндр -->
+                        <div id="cylinder-2" class="cylinder bg-white border-x-4 border-b-4 border-gray-400 relative" style="height: 240px; width: 120px;">
+                            <div id="piston-2" class="piston-container absolute left-0 right-0 z-20" style="bottom: 30px;">
+                                <div class="bg-gray-800 h-6 w-full border-b-2 border-black relative z-30"></div>
+                            </div>
+                            <div class="absolute bottom-0 w-full bg-blue-400 opacity-60" id="fluid-2" style="height: 30px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Органи управління -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 bg-gray-50 p-4 md:p-6 rounded-xl border">
+                        <div class="space-y-3">
+                            <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                1. Хід малого поршня (<span class="text-blue-600 font-serif italic text-sm">h₁</span>):
+                            </label>
+                            <input type="range" id="move-slider" min="0" max="100" value="50" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-red-600">
+                        </div>
+                        <div class="space-y-3">
+                            <label class="block text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                2. Площа поршня (<span class="text-blue-600 font-serif italic text-sm">S₂</span>):
+                            </label>
+                            <input type="range" id="size-slider" min="60" max="200" value="120" class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-green-600">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Розділ 4: Золоте правило механіки -->
+            <section class="bg-blue-50 p-4 md:p-6 rounded-xl border border-blue-100">
+                <h3 class="text-lg md:text-xl font-bold text-blue-800 mb-4">4. Золоте правило механіки</h3>
+                <p class="text-base md:text-lg leading-relaxed">
+                    Гідравлічна машина дозволяє виграти в силі, але за це доводиться платити відстанню. Чим більшу силу ми отримуємо на великому поршні, тим меншу відстань він проходить порівняно з малим поршнем.
+                </p>
+               
+                <div class="flex justify-center my-8">
+                    <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border-2 border-blue-600 text-center">
+                        <p class="text-[10px] md:text-sm text-gray-400 uppercase font-bold mb-4 tracking-widest">Пропорція відстаней:</p>
+                        <div class="text-2xl md:text-4xl font-bold text-blue-900">
+                            \[\frac{F_2}{F_1} = \frac{h_1}{h_2}\]
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div class="p-4 bg-white rounded-lg border border-blue-100 text-center text-sm md:text-base">
+                        <p><span class="font-serif italic">h₁</span> — шлях малого поршня</p>
+                    </div>
+                    <div class="p-4 bg-white rounded-lg border border-blue-100 text-center text-sm md:text-base">
+                        <p><span class="font-serif italic">h₂</span> — шлях великого поршня</p>
+                    </div>
+                </div>
+               
+                <div class="mt-6 p-4 bg-blue-100 rounded-lg text-blue-900 text-center font-bold text-sm md:text-base">
+                    Жодна машина не дає виграшу в роботі: у скільки разів виграємо в силі, у стільки ж разів програємо у відстані.
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="bg-gray-100 text-gray-400 p-6 text-center text-[10px] md:text-xs uppercase tracking-widest border-t border-gray-200">
+            Інтерактивний навчальний матеріал
+        </footer>
+    </div>
+
+    <script>
+        const moveSlider = document.getElementById('move-slider');
+        const sizeSlider = document.getElementById('size-slider');
+       
+        const p1 = document.getElementById('piston-1');
+        const p2 = document.getElementById('piston-2');
+        const f1 = document.getElementById('fluid-1');
+        const f2 = document.getElementById('fluid-2');
+        const cyl2 = document.getElementById('cylinder-2');
+
+        // Логіка перемикання формул
+        function showFormula(type, el) {
+            const output = document.getElementById('math-output');
+            document.querySelectorAll('.formula-card').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+
+            let latex = "";
+            switch(type) {
+                case 'f2': latex = "\\[F_2 = \\frac{F_1 \\cdot S_2}{S_1}\\]"; break;
+                case 'f1': latex = "\\[F_1 = \\frac{F_2 \\cdot S_1}{S_2}\\]"; break;
+                case 's2': latex = "\\[S_2 = \\frac{F_2 \\cdot S_1}{F_1}\\]"; break;
+                case 's1': latex = "\\[S_1 = \\frac{F_1 \\cdot S_2}{F_2}\\]"; break;
+            }
+            output.innerHTML = latex;
+            if (window.MathJax) {
+                MathJax.typesetPromise([output]);
+            }
+        }
+
+        // Логіка симуляції
+        function update() {
+            const moveVal = parseInt(moveSlider.value);
+            const s2Width = parseInt(sizeSlider.value);
+            const s1Width = 48; // Фіксована ширина малого циліндра (w-12 = 48px)
+
+            cyl2.style.width = s2Width + 'px';
+            const ratio = s2Width / s1Width;
+
+            // Рух малого поршня
+            const h1Base = 200; // Максимальна висота
+            const h1Current = h1Base - (moveVal * 1.8);
+            p1.style.bottom = h1Current + 'px';
+            f1.style.height = h1Current + 'px';
+
+            // Рух великого поршня (обернено пропорційно площі)
+            const moveDelta = moveVal * 1.8;
+            const h2Current = 10 + (moveDelta / ratio);
+            p2.style.bottom = h2Current + 'px';
+            f2.style.height = h2Current + 'px';
+        }
+
+        moveSlider.addEventListener('input', update);
+        sizeSlider.addEventListener('input', update);
+        
+        // Ініціалізація
+        window.addEventListener('load', update);
+    </script>
+</body>
+</html>
