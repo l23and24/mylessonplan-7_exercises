@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДЗ: № 73.2 Гідравлічний прес</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+        
+        body { 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh;
+        }
+
+        .cambria-font { font-family: 'Cambria', 'Noto Sans', serif; }
+
+        .fade-in-row {
+            animation: fadeIn 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        select { text-align-last: center; cursor: pointer; }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const CheckCircle2 = () => <i data-lucide="check-circle-2" className="text-green-500 w-6 h-6"></i>;
+        const XCircle = () => <i data-lucide="x-circle" className="text-red-400 w-6 h-6"></i>;
+        const AlertTriangle = () => <i data-lucide="alert-triangle" className="w-4 h-4 text-amber-500"></i>;
+
+        const formatNum = (num) => {
+            if (num === "" || num === undefined) return "";
+            return num.toString().replace('.', ',');
+        };
+
+        const App = () => {
+            const initialTasks = [
+                { id: 1, f1: "50", s1: "200", f2: "", s2: "2", target: "f2", correct: 500, uF: "Н", uS: "см²", uF2: "Н", uS2: "м²", uRes: "Н", warned: "s1" },
+                { id: 2, f1: "0,5", s1: "10", f2: "250", s2: "", target: "s2", correct: 5000, uF: "кН", uS: "см²", uF2: "Н", uS2: "см²", uRes: "см²", warned: "f1" },
+                { id: 3, f1: "", s1: "400", f2: "1000", s2: "1", target: "f1", correct: 40, uF: "Н", uS: "см²", uF2: "Н", uS2: "м²", uRes: "Н", warned: "s1" },
+                { id: 4, f1: "20", s1: "0,005", f2: "400", s2: "", target: "s2", correct: 0.1, uF: "Н", uS: "м²", uF2: "Н", uS2: "м²", uRes: "м²", warned: "s1" },
+                { id: 5, f1: "80", s1: "20", f2: "1,2", s2: "", target: "s2", correct: 300, uF: "Н", uS: "см²", uF2: "кН", uS2: "см²", uRes: "см²", warned: "f2" },
+                { id: 6, f1: "1,5", s1: "50", f2: "", s2: "150", target: "f2", correct: 4.5, uF: "кН", uS: "см²", uF2: "кН", uS2: "см²", uRes: "кН", warned: "f1" }
+            ];
+
+            const optionsMap = {
+                1: [500, 50, 5000, 250],
+                2: [5000, 500, 50, 50000],
+                3: [40, 4, 400, 10],
+                4: [0.1, 0.01, 1, 0.5],
+                5: [300, 30, 3, 150],
+                6: [4.5, 45, 0.45, 15]
+            };
+
+            const [tasks, setTasks] = useState([]);
+            const [userInputs, setUserInputs] = useState({});
+            const [results, setResults] = useState({});
+            const audioCtx = useRef(null);
+
+            useEffect(() => {
+                const ordered = initialTasks.map(t => ({
+                    ...t,
+                    opt: [...optionsMap[t.id]].sort(() => Math.random() - 0.5)
+                }));
+                setTasks(ordered);
+            }, []);
+
+            useEffect(() => {
+                if (window.lucide) window.lucide.createIcons();
+            }, [tasks, results]);
+
+            const playSound = (type) => {
+                if (!audioCtx.current) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContextClass) audioCtx.current = new AudioContextClass();
+                }
+                if (audioCtx.current) {
+                    const osc = audioCtx.current.createOscillator();
+                    const gain = audioCtx.current.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.current.destination);
+                    osc.frequency.setValueAtTime(type === 'success' ? 880 : 220, audioCtx.current.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.current.currentTime);
+                    osc.start(); osc.stop(audioCtx.current.currentTime + 0.1);
+                }
+            };
+
+            const handleSelect = (id, val) => {
+                if (!val) return;
+                setUserInputs(prev => ({ ...prev, [id]: val }));
+                const task = tasks.find(t => t.id === id);
+                if (parseFloat(val.replace(',', '.')) === task.correct) {
+                    playSound('success'); setResults(prev => ({ ...prev, [id]: 'correct' }));
+                } else {
+                    playSound('error'); setResults(prev => ({ ...prev, [id]: 'wrong' }));
+                }
+            };
+
+            const DisplayValue = ({ val, unit, isWarned }) => (
+                <div className="flex flex-col items-center whitespace-nowrap">
+                    <div className="flex items-baseline justify-center gap-1.5">
+                        <span className="text-xl md:text-2xl font-bold text-slate-700">{formatNum(val)}</span>
+                        <span className="text-sm md:text-lg font-bold text-slate-400">{unit}</span>
+                    </div>
+                    {isWarned && (
+                        <div className="flex items-center gap-1 mt-1 px-2 py-0.5 bg-amber-50 rounded text-[8px] md:text-[9px] text-amber-700 font-bold uppercase tracking-tighter border border-amber-100">
+                            <AlertTriangle /> Увага: Одиниці
+                        </div>
+                    )}
+                </div>
+            );
+
+            return (
+                <div className="w-full min-h-screen py-6 md:py-10 px-2 md:px-4 flex justify-center items-start cambria-font text-slate-900">
+                    <div className="w-full max-w-7xl space-y-6 md:space-y-8">
+                        <div className="text-center sm:text-left px-2">
+                            <h1 className="text-2xl md:text-4xl font-black text-slate-800 tracking-tight">№73.1 Домашнє завдання</h1>
+                            <p className="text-slate-500 mt-1 italic text-base md:text-lg font-bold">Гідравлічний прес (профі)</p>
+                        </div>
+                        <div className="bg-white border border-slate-200 rounded-xl md:rounded-[2rem] shadow-xl table-container">
+                            <table className="w-full min-w-[700px] text-center border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50 border-b border-slate-100">
+                                        <th colSpan="2" className="py-3 md:py-5 text-[9px] font-black text-blue-600 uppercase tracking-widest">Малий поршень (1)</th>
+                                        <th colSpan="2" className="py-3 md:py-5 text-[9px] font-black text-rose-600 uppercase tracking-widest border-l border-slate-100">Великий поршень (2)</th>
+                                        <th rowSpan="2" className="w-16 md:w-24 border-l border-slate-100">Статус</th>
+                                    </tr>
+                                    <tr className="bg-white text-slate-400 border-b border-slate-100">
+                                        <th className="py-2 text-[10px] font-bold uppercase">Сила F₁</th>
+                                        <th className="py-2 text-[10px] font-bold uppercase">Площа S₁</th>
+                                        <th className="py-2 text-[10px] font-bold uppercase border-l border-slate-100">Сила F₂</th>
+                                        <th className="py-2 text-[10px] font-bold uppercase">Площа S₂</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {tasks.map((t, idx) => (
+                                        <tr key={t.id} className="fade-in-row hover:bg-slate-50/50 transition-colors" style={{animationDelay: `${idx * 0.05}s`}}>
+                                            <td className="p-4 md:p-8">
+                                                {t.target === 'f1' ? (
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <select onChange={(e) => handleSelect(t.id, e.target.value)} value={userInputs[t.id] || ''} 
+                                                            className={`w-24 md:w-32 border-2 rounded-lg py-2 px-1 font-bold text-center transition-all ${results[t.id] === 'correct' ? 'bg-green-500 border-green-500 text-white' : results[t.id] === 'wrong' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-white border-slate-200 hover:border-blue-300'}`}>
+                                                            <option value="">?</option>{t.opt.map(o => <option key={o} value={o}>{formatNum(o)}</option>)}
+                                                        </select>
+                                                        <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{t.uRes}</span>
+                                                    </div>
+                                                ) : <DisplayValue val={t.f1} unit={t.uF} isWarned={t.warned === 'f1'} />}
+                                            </td>
+                                            <td className="p-4 md:p-8">
+                                                {t.target === 's1' ? (
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <select onChange={(e) => handleSelect(t.id, e.target.value)} value={userInputs[t.id] || ''} 
+                                                            className={`w-24 md:w-32 border-2 rounded-lg py-2 px-1 font-bold text-center transition-all ${results[t.id] === 'correct' ? 'bg-green-500 border-green-500 text-white' : results[t.id] === 'wrong' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-white border-slate-200 hover:border-blue-300'}`}>
+                                                            <option value="">?</option>{t.opt.map(o => <option key={o} value={o}>{formatNum(o)}</option>)}
+                                                        </select>
+                                                        <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{t.uRes}</span>
+                                                    </div>
+                                                ) : <DisplayValue val={t.s1} unit={t.uS} isWarned={t.warned === 's1'} />}
+                                            </td>
+                                            <td className="p-4 md:p-8 border-l border-slate-100">
+                                                {t.target === 'f2' ? (
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <select onChange={(e) => handleSelect(t.id, e.target.value)} value={userInputs[t.id] || ''} 
+                                                            className={`w-24 md:w-32 border-2 rounded-lg py-2 px-1 font-bold text-center transition-all ${results[t.id] === 'correct' ? 'bg-green-500 border-green-500 text-white' : results[t.id] === 'wrong' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-white border-slate-200 hover:border-blue-300'}`}>
+                                                            <option value="">?</option>{t.opt.map(o => <option key={o} value={o}>{formatNum(o)}</option>)}
+                                                        </select>
+                                                        <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{t.uRes}</span>
+                                                    </div>
+                                                ) : <DisplayValue val={t.f2} unit={t.uF2} isWarned={t.warned === 'f2'} />}
+                                            </td>
+                                            <td className="p-4 md:p-8">
+                                                {t.target === 's2' ? (
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <select onChange={(e) => handleSelect(t.id, e.target.value)} value={userInputs[t.id] || ''} 
+                                                            className={`w-24 md:w-32 border-2 rounded-lg py-2 px-1 font-bold text-center transition-all ${results[t.id] === 'correct' ? 'bg-green-500 border-green-500 text-white' : results[t.id] === 'wrong' ? 'bg-red-50 border-red-300 text-red-700' : 'bg-white border-slate-200 hover:border-blue-300'}`}>
+                                                            <option value="">?</option>{t.opt.map(o => <option key={o} value={o}>{formatNum(o)}</option>)}
+                                                        </select>
+                                                        <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase">{t.uRes}</span>
+                                                    </div>
+                                                ) : <DisplayValue val={t.s2} unit={t.uS2} isWarned={t.warned === 's2'} />}
+                                            </td>
+                                            <td className="p-2 md:p-4 border-l border-slate-100">
+                                                <div className="flex justify-center">
+                                                    {results[t.id] === 'correct' ? <CheckCircle2 /> : results[t.id] === 'wrong' ? <XCircle /> : <div className="w-5 h-5 rounded-full border-2 border-dashed border-slate-200"></div>}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
