@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер: №73.2 Гідростатичний тиск</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+        
+        body { 
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh;
+        }
+
+        .cambria-font { font-family: 'Cambria', 'Noto Sans', serif; }
+
+        .fade-in-card {
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Іконки
+        const Check = () => <i data-lucide="check" className="text-white w-5 h-5"></i>;
+        const X = () => <i data-lucide="x" className="text-white w-5 h-5"></i>;
+        const Info = () => <i data-lucide="info" className="w-5 h-5"></i>;
+        const Refresh = () => <i data-lucide="refresh-cw" className="w-4 h-4"></i>;
+        const Waves = () => <i data-lucide="waves" className="text-blue-500 w-8 h-8"></i>;
+
+        const formatNum = (num) => num.toString().replace('.', ',');
+
+        const App = () => {
+            const initialTasks = [
+                { id: 1, type: 'p', rho: 1000, g: 10, h: 5, unit: 'Па', target: 'p', correct: 50000, label: 'Вода', desc: 'Тиск на дні басейну', options: [50000, 5000, 1000, 25000] },
+                { id: 2, type: 'h', rho: 1030, g: 10, h: null, unit: 'м', target: 'h', p: 10300, correct: 1, label: 'Морська вода', desc: 'На якій глибині тиск 10,3 кПа?', options: [1, 10, 0.5, 2] },
+                { id: 3, type: 'rho', rho: null, g: 10, h: 2, unit: 'кг/м³', target: 'rho', p: 16000, correct: 800, label: 'Олія', desc: 'Визначте густину рідини', options: [800, 900, 700, 1000] },
+                { id: 4, type: 'p', rho: 13600, g: 10, h: 0.76, unit: 'Па', target: 'p', correct: 103360, label: 'Ртуть', desc: 'Тиск стовпчика ртуті', options: [103360, 13600, 76000, 101300] },
+                { id: 5, type: 'h', rho: 800, g: 10, h: null, unit: 'м', target: 'h', p: 4000, correct: 0.5, label: 'Керосин', desc: 'Висота стовпа для тиску 4 кПа', options: [0.5, 5, 1, 0.2] },
+                { id: 6, type: 'p', rho: 1000, g: 10, h: 10, unit: 'кПа', target: 'p', correct: 100, label: 'Вода', desc: 'Тиск на глибині 10 м', options: [100, 10, 1000, 50] }
+            ];
+
+            const [tasks, setTasks] = useState([]);
+            const [answers, setAnswers] = useState({});
+            const [showHint, setShowHint] = useState(false);
+            const audioCtx = useRef(null);
+
+            useEffect(() => {
+                shuffleTasks();
+            }, []);
+
+            useEffect(() => {
+                if (window.lucide) window.lucide.createIcons();
+            }, [tasks, answers, showHint]);
+
+            const shuffleTasks = () => {
+                const shuffled = initialTasks.map(t => ({
+                    ...t,
+                    options: [...t.options].sort(() => Math.random() - 0.5)
+                }));
+                setTasks(shuffled);
+                setAnswers({});
+            };
+
+            const playSound = (isCorrect) => {
+                if (!audioCtx.current) audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.current.createOscillator();
+                const gain = audioCtx.current.createGain();
+                osc.connect(gain); gain.connect(audioCtx.current.destination);
+                osc.frequency.setValueAtTime(isCorrect ? 880 : 220, audioCtx.current.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.current.currentTime);
+                osc.start(); osc.stop(audioCtx.current.currentTime + 0.1);
+            };
+
+            const handleAnswer = (id, val) => {
+                const task = tasks.find(t => t.id === id);
+                const isCorrect = parseFloat(val) === task.correct;
+                setAnswers(prev => ({ ...prev, [id]: isCorrect ? 'correct' : 'wrong' }));
+                playSound(isCorrect);
+            };
+
+            const FormulaHint = () => (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowHint(false)}>
+                    <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl border border-blue-100" onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-start mb-6">
+                            <div className="bg-blue-50 p-3 rounded-2xl"><Waves /></div>
+                            <button onClick={() => setShowHint(false)} className="text-slate-300 hover:text-slate-500"><X /></button>
+                        </div>
+                        <h3 className="text-xl font-black text-slate-800 mb-2">Гідростатичний тиск</h3>
+                        <div className="text-4xl cambria-font font-bold text-blue-600 text-center py-6 border-y border-slate-50 my-4 italic">
+                            p = ρ · g · h
+                        </div>
+                        <ul className="space-y-3 text-sm text-slate-600">
+                            <li className="flex justify-between"><span><strong className="italic">p</strong> — тиск</span><span className="text-slate-400">Па</span></li>
+                            <li className="flex justify-between"><span><strong>ρ</strong> — густина</span><span className="text-slate-400">кг/м³</span></li>
+                            <li className="flex justify-between"><span><strong>g</strong> ≈ 10</span><span className="text-slate-400">Н/кг</span></li>
+                            <li className="flex justify-between"><span><strong>h</strong> — глибина занурення</span><span className="text-slate-400">м</span></li>
+                        </ul>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="max-w-5xl mx-auto py-8 px-4 cambria-font">
+                    {showHint && <FormulaHint />}
+                    
+                    <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 text-center md:text-left">
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-black text-slate-800 tracking-tight">№73.2 Гідростатичний тиск</h1>
+                            <p className="text-slate-500 font-medium">Тренажер для учнів 7 класу</p>
+                        </div>
+                        <div className="flex gap-3">
+                            <button onClick={() => setShowHint(true)} className="flex items-center gap-2 px-5 py-2.5 bg-white rounded-2xl shadow-sm border border-slate-200 text-blue-600 font-bold hover:bg-blue-50 transition-all">
+                                <Info /> Формула
+                            </button>
+                            <button onClick={shuffleTasks} className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white rounded-2xl shadow-lg font-bold hover:bg-slate-700 transition-all">
+                                <Refresh /> Оновити
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {tasks.map((t, idx) => (
+                            <div key={t.id} className="fade-in-card bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden flex flex-col h-full" style={{animationDelay: `${idx * 0.1}s`}}>
+                                <div className="p-6 flex-1">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-blue-500 bg-blue-50 px-3 py-1 rounded-full">
+                                            Завдання #{t.id}
+                                        </div>
+                                        {answers[t.id] === 'correct' && <div className="bg-green-500 p-1 rounded-full"><Check /></div>}
+                                        {answers[t.id] === 'wrong' && <div className="bg-red-500 p-1 rounded-full"><X /></div>}
+                                    </div>
+                                    
+                                    <h4 className="font-bold text-slate-800 text-lg mb-1">{t.desc}</h4>
+                                    <p className="text-slate-400 text-xs mb-4 italic">{t.label}</p>
+
+                                    <div className="bg-slate-50 rounded-2xl p-4 space-y-2 mb-6 text-sm">
+                                        {t.type !== 'rho' && <div className="flex justify-between"><span>Густина (ρ):</span> <span className="font-bold">{t.rho} кг/м³</span></div>}
+                                        {t.type !== 'h' && <div className="flex justify-between"><span>Глибина (h):</span> <span className="font-bold">{t.h} м</span></div>}
+                                        {t.type !== 'p' && <div className="flex justify-between"><span>Тиск (<span className="italic">p</span>):</span> <span className="font-bold">{formatNum(t.p)} Па</span></div>}
+                                        <div className="flex justify-between text-slate-400"><span>Стала (g):</span> <span>10 Н/кг</span></div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Відповідь ({t.unit}):</p>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {t.options.map(opt => (
+                                                <button 
+                                                    key={opt}
+                                                    onClick={() => handleAnswer(t.id, opt)}
+                                                    className={`py-3 px-2 rounded-xl border-2 font-bold transition-all text-sm
+                                                        ${answers[t.id] === 'correct' && opt === t.correct ? 'bg-green-500 border-green-500 text-white shadow-md' : 
+                                                          'bg-white border-slate-100 text-slate-700 hover:border-blue-200 hover:bg-blue-50/50'}`}
+                                                >
+                                                    {formatNum(opt)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="h-2 w-full bg-slate-50 mt-auto">
+                                    <div 
+                                        className={`h-full transition-all duration-500 ${answers[t.id] === 'correct' ? 'w-full bg-green-500' : 'w-0 bg-blue-500'}`}
+                                    ></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="mt-12 p-6 bg-white rounded-3xl shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-4 text-center md:text-left">
+                            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
+                                {Object.values(answers).filter(v => v === 'correct').length}
+                            </div>
+                            <div>
+                                <p className="font-black text-slate-800 leading-tight">Результат</p>
+                                <p className="text-xs text-slate-500">Правильно: {Object.values(answers).filter(v => v === 'correct').length} / {tasks.length}</p>
+                            </div>
+                        </div>
+                        <div className="flex-1 max-w-md w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                            <div 
+                                className="h-full bg-blue-600 transition-all duration-700"
+                                style={{ width: `${(Object.values(answers).filter(v => v === 'correct').length / tasks.length) * 100}%` }}
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
