@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Конвертер тиску: кПа у мм рт. ст.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f0f4f8;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        /* Фікс для запобігання автозуму в iOS Safari */
+        input[type="number"] {
+            font-size: 16px !important;
+        }
+        .step-highlight {
+            transition: all 0.2s ease;
+        }
+        /* Адаптація для дуже малих екранів */
+        @media (max-width: 640px) {
+            h1 { font-size: 1.5rem !important; }
+            .p-4 { padding: 1rem !important; }
+            .card { padding: 1.25rem !important; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+    <div class="max-w-3xl mx-auto">
+        <!-- Заголовок -->
+        <header class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2">Переведення кПа у мм рт. ст.</h1>
+        </header>
+
+        <!-- Теоретична частина -->
+        <section class="card p-5 md:p-6 mb-6 border-l-4 border-blue-500">
+            <h2 class="text-lg md:text-xl font-semibold mb-3 flex items-center">
+                <span class="mr-2">💡</span> Принцип розрахунку
+            </h2>
+            <div id="theoryContent">
+                <p class="mb-4 text-slate-700 text-sm md:text-base">
+                    Щоб перевести тиск з <b>кілопаскалів (кПа)</b> у <b>міліметри ртутного стовпа (мм рт. ст.)</b>, використовуємо такий алгоритм:
+                </p>
+                <ul class="list-disc ml-5 space-y-2 text-slate-700 text-sm md:text-base">
+                    <li>Спочатку переводимо кПа у Па (множимо на 1000).</li>
+                    <li>Отримане значення ділимо на 133,3 (оскільки 1 мм рт. ст. ≈ 133,3 Па).</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Калькулятор -->
+        <section class="card p-5 md:p-6 mb-6">
+            <h2 class="text-lg md:text-xl font-semibold mb-4 text-slate-800">Онлайн розрахунок</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Тиск у кілопаскалях (кПа):</label>
+                    <input type="number" id="inputVal" value="100" 
+                           inputmode="decimal"
+                           class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition-all"
+                           oninput="calculate()">
+                </div>
+
+                <div id="steps" class="space-y-3 mt-6">
+                    <div class="step-highlight p-3 border-l-4 border-slate-200 bg-slate-50 rounded-r-lg">
+                        <p class="text-[10px] md:text-xs text-slate-400 font-bold uppercase">Крок 1: Переведення у Паскалі (Па)</p>
+                        <p id="step1Display" class="text-base md:text-lg font-mono text-slate-800 break-words"></p>
+                    </div>
+                    <div class="step-highlight p-3 border-l-4 border-slate-200 bg-slate-50 rounded-r-lg">
+                        <p class="text-[10px] md:text-xs text-slate-400 font-bold uppercase">Крок 2: Ділення на 133,3</p>
+                        <p id="step2Display" class="text-base md:text-lg font-mono text-slate-800 break-words"></p>
+                    </div>
+                </div>
+
+                <!-- Фінальний результат -->
+                <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl text-center">
+                    <p class="text-green-800 text-sm font-medium">Результат:</p>
+                    <div id="finalResult" class="text-2xl md:text-3xl font-bold text-green-700"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Завдання для самоперевірки -->
+        <h2 class="text-lg md:text-xl font-bold text-slate-800 mb-4 px-2">Завдання для самоперевірки</h2>
+        <p class="text-xs text-slate-500 mb-4 px-2 italic">Спробуйте розв'язати самостійно, а потім натисніть кнопку для перевірки.</p>
+        
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <!-- Завдання 1 -->
+            <div class="card p-5 border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-1 text-sm md:text-base">Завдання №1</h3>
+                    <p class="text-slate-600 text-sm mb-4">Виразіть у мм рт. ст. тиск <span class="font-bold whitespace-nowrap text-slate-800">35 кПа</span></p>
+                </div>
+                <button onclick="setExample(35)" class="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl transition-all text-sm font-bold shadow-sm">
+                    Перевірити розв'язання
+                </button>
+            </div>
+            <!-- Завдання 2 -->
+            <div class="card p-5 border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-1 text-sm md:text-base">Завдання №2</h3>
+                    <p class="text-slate-600 text-sm mb-4">Виразіть у мм рт. ст. тиск <span class="font-bold whitespace-nowrap text-slate-800">90 кПа</span></p>
+                </div>
+                <button onclick="setExample(90)" class="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl transition-all text-sm font-bold shadow-sm">
+                    Перевірити розв'язання
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function calculate() {
+            const input = document.getElementById('inputVal').value;
+            const step1Display = document.getElementById('step1Display');
+            const step2Display = document.getElementById('step2Display');
+            const finalResult = document.getElementById('finalResult');
+
+            if (input === "" || parseFloat(input) < 0) {
+                step1Display.innerText = "...";
+                step2Display.innerText = "...";
+                finalResult.innerText = "0 мм рт. ст.";
+                return;
+            }
+
+            const val = parseFloat(input);
+            const valStr = val.toString().replace('.', ',');
+
+            // Розрахунок
+            const pa = (val * 1000).toFixed(0);
+            const mm = (pa / 133.3).toFixed(1);
+            
+            // Відображення кроків з заміною крапки на кому
+            step1Display.innerHTML = `${valStr} кПа \u22C5 1000 = <span class="text-blue-600 font-bold">${pa}</span> Па`;
+            step2Display.innerHTML = `${pa} Па : 133,3 \u2248 <span class="text-blue-600 font-bold">${mm.replace('.', ',')}</span> мм рт. ст.`;
+            
+            finalResult.innerText = `${mm.replace('.', ',')} мм рт. ст.`;
+        }
+
+        function setExample(val) {
+            const input = document.getElementById('inputVal');
+            input.value = val;
+            calculate();
+            
+            // Плавна прокрутка з відступом зверху для зручності
+            const offset = input.getBoundingClientRect().top + window.pageYOffset - 120;
+            window.scrollTo({
+                top: offset,
+                behavior: 'smooth'
+            });
+            
+            // Візуальний ефект "блимання" для фокусу уваги
+            input.classList.add('ring-4', 'ring-blue-500/30');
+            setTimeout(() => {
+                input.classList.remove('ring-4', 'ring-blue-500/30');
+            }, 800);
+        }
+
+        // Запуск розрахунку при завантаженні сторінки
+        window.onload = calculate;
+    </script>
+</body>
+</html>
