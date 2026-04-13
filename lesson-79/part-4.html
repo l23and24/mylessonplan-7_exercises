@@ -2,8 +2,8 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Задача 80.2: Тиск на станції метро</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задача № 80.2 - Адаптивна версія</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         window.MathJax = {
@@ -11,12 +11,9 @@
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
                 displayMath: [['$$', '$$'], ['\\[', '\\]']]
             },
-            options: { enableMenu: false },
-            startup: {
-                pageReady: () => {
-                    return MathJax.startup.defaultPageReady().then(() => {
-                        document.body.classList.add('mathjax-ready');
-                    });
+            options: {
+                renderActions: {
+                    addMenu: [] 
                 }
             }
         };
@@ -24,234 +21,266 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         body {
-            font-family: "Cambria Math", "Cambria", "Times New Roman", serif;
-            background-color: #f9f9f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Times New Roman", serif;
+            background-color: #ffffff;
             color: #000000;
-            font-size: 18px;
-            line-height: 1.4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 10px 0 80px 0;
-            touch-action: manipulation;
+            line-height: 1.5;
             overflow-x: hidden;
+            margin: 0;
+            padding: 15px;
+            font-size: 18px;
         }
 
-        .main-wrapper {
-            background-color: #ffffff;
-            width: 95%;
-            max-width: 1100px;
+        @media (min-width: 768px) {
+            body { font-size: 20px; }
+            .container { max-width: 1100px; margin: 0 auto; }
+        }
+
+        * { font-style: normal !important; }
+
+        .task-card {
+            background: #f9fafb;
+            border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-radius: 8px;
-            box-sizing: border-box;
+            margin-bottom: 25px;
+            border: 1px solid #e5e7eb;
         }
 
         .task-title {
             font-weight: bold;
-            font-size: 24px;
+            font-size: 1.4rem;
+            color: #1f2937;
             margin-bottom: 10px;
-            color: #1a1a1a;
+        }
+
+        .task-text {
+            text-align: justify;
+            hyphens: auto;
         }
 
         .step {
             opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.4s ease-out;
+            transform: translateY(10px);
+            transition: all 0.4s ease-out;
+            pointer-events: none;
+            margin-bottom: 15px;
         }
 
         .step.visible {
             opacity: 1;
-            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .physics-grid {
-            display: grid;
-            grid-template-columns: 1fr 0.6fr 1.4fr 1fr;
-            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .column {
-            padding: 10px;
-            border-right: 1px solid #ddd;
+        @media (min-width: 768px) {
+            .physics-grid {
+                flex-direction: row;
+                align-items: stretch;
+            }
+            .grid-col {
+                flex: 1;
+                padding: 0 15px;
+            }
+            .col-dano { flex: 0.7; }
+            .col-si { flex: 0.5; }
+            .col-solve { flex: 1.2; }
+            .v-line { border-right: 2px solid #000; }
         }
-
-        .v-line-bold { border-right: 2px solid black; }
 
         .header-cell {
             font-weight: bold;
-            font-size: 20px; 
+            font-size: 1.2rem;
             margin-bottom: 15px;
-            text-align: center;
+            padding-bottom: 5px;
         }
 
-        .h-line-short {
-            border-top: 2px solid black;
-            margin-top: 20px;
+        .dano-divider {
+            border-top: 2px solid #000;
+            margin-top: 15px;
             padding-top: 15px;
-            width: 80%;
         }
 
-        /* Навігація зі стрілками */
-        .nav-arrow {
+        .controls {
             position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 60px;
-            height: 60px;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: auto;
+            background: #1f2937;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid #ddd;
-            border-radius: 50%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            transition: all 0.2s;
+            gap: 8px;
+            transition: transform 0.2s;
         }
 
-        .nav-arrow:hover {
-            background: #fff;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        .nav-btn:active { transform: scale(0.95); }
+        .nav-btn.hidden { visibility: hidden; opacity: 0; }
+
+        .answer-box {
+            border-top: 3px solid #000;
+            margin-top: 40px;
+            padding: 20px 0;
+            font-weight: bold;
+            margin-bottom: 100px;
         }
-
-        .nav-arrow.left { left: 20px; }
-        .nav-arrow.right { right: 20px; }
-
-        @media (max-width: 900px) {
-            body { font-size: 17px; padding-bottom: 100px; }
-            .physics-grid { display: block; }
-            .column {
-                border-right: none !important;
-                border-bottom: 1px solid #eee;
-                width: 100% !important;
-                padding: 15px 0;
-            }
-            .nav-arrow {
-                top: auto;
-                bottom: 20px;
-                transform: none;
-                width: 70px;
-                height: 70px;
-            }
-            .nav-arrow.left { left: 10%; }
-            .nav-arrow.right { right: 10%; }
-            .header-cell { text-align: left; background: #f0f0f0; padding: 8px; }
-        }
-
-        mjx-container { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
     </style>
 </head>
 <body>
 
-    <div id="prev-btn" class="nav-arrow left" title="Попередній крок">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="m15 18-6-6 6-6"/></svg>
-    </div>
-    <div id="next-btn" class="nav-arrow right" title="Наступний крок">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-800"><path d="m9 18 6-6-6-6"/></svg>
-    </div>
-
-    <div class="main-wrapper">
-        <div class="task-header">
-            <div class="task-title">Задача 80.2</div>
+    <div class="container">
+        <div class="task-card">
+            <div class="task-title">Задача № 80.2</div>
             <div class="task-text">
                 При вході в метро барометр показує $101,3 \, \text{кПа}$. Якими будуть показання барометра на найглибшій станції київського метро, яка розташована на глибині приблизно $110 \, \text{м}$?
             </div>
         </div>
 
-        <div id="main-container" class="physics-grid">
-            <div class="column v-line-bold">
+        <div class="physics-grid">
+            <!-- Дано -->
+            <div class="grid-col col-dano v-line">
                 <div class="header-cell">Дано:</div>
-                <div class="space-y-3">
-                    <div class="step" id="step-1">$p_1 = 101,3 \, \text{кПа}$</div>
-                    <div class="step" id="step-2">$h = 110 \, \text{м}$</div>
-                    <div class="step" id="step-3">$\Delta p \approx 11,1 \, \frac{\text{Па}}{\text{м}}$</div>
-                    <div class="h-line-short step" id="step-6">$p_2 - ?$</div>
+                <div id="s1" class="step">$p_1 = 101,3 \, \text{кПа}$</div>
+                <div id="s2" class="step">$h = 110 \, \text{м}$</div>
+                <div id="s3" class="step">$\Delta p_0 \approx 11,1 \, \frac{\text{Па}}{\text{м}}$</div>
+                <div id="s4" class="step dano-divider">
+                    <div>$p_2 - ?$</div>
                 </div>
             </div>
 
-            <div class="column v-line-bold">
+            <!-- СІ -->
+            <div class="grid-col col-si v-line">
                 <div class="header-cell">СІ</div>
-                <div class="space-y-3 text-center md:text-left">
-                    <div class="step" id="step-4">$101300 \, \text{Па}$</div>
-                    <div class="step" id="step-5">---</div>
-                </div>
+                <div id="s5" class="step">$101300 \, \text{Па}$</div>
+                <div id="s6" class="step">---</div>
             </div>
 
-            <div class="column v-line-bold">
+            <!-- Розв'язання -->
+            <div class="grid-col col-solve v-line">
                 <div class="header-cell">Розв'язання</div>
-                <div class="space-y-4">
-                    <div class="step" id="step-7">При невеликих змінах висоти тиск змінюється на $11,1 \, \text{Па}$ на кожен метр.</div>
-                    <div class="step" id="step-8">Формула тиску:</div>
-                    <div class="step" id="step-9">$\Delta p \approx 11,1 \, \text{Па/м}$</div>
-                    <div class="step" id="step-10">$p_2 = p_1 + \Delta p \cdot h$</div>
+                <div id="s7" class="step">
+                    <p>При спуску вглиб атмосферний тиск зростає.</p>
+                </div>
+                <div id="s8" class="step">
+                    $$ \Delta p = \Delta p_0 \cdot h $$
+                </div>
+                <div id="s9" class="step">
+                    $$ p_2 = p_1 + \Delta p $$
                 </div>
             </div>
 
-            <div class="column">
-                <div class="header-cell">&nbsp;</div>
-                <div class="space-y-4">
-                    <div class="step" id="step-11">
-                        $\Delta p = 11,1 \cdot 110 \approx 1221 \, \text{Па}$
-                    </div>
-                    <div class="step" id="step-12">
-                        $p_2 = 101300 + 1221 = 102521 \, \text{Па}$
-                    </div>
+            <!-- Обчислення -->
+            <div class="grid-col">
+                <div class="header-cell">Обчислення</div>
+                <div id="s10" class="step">
+                    $$ \Delta p = 11,1 \cdot 110 \approx 1221 \, (\text{Па}) $$
+                </div>
+                <div id="s11" class="step">
+                    $$ p_2 = 101300 + 1221 = 102521 \, (\text{Па}) $$
                 </div>
             </div>
         </div>
 
-        <div class="step answer-box font-bold mt-8" id="step-13">
-            Відповідь: $p_2 \approx 102,5 \, \text{кПа}$.
+        <div id="s12" class="step answer-box">
+            Відповідь: на глибині $110 \, \text{м}$ барометр покаже приблизно $102,5 \, \text{кПа}$.
         </div>
     </div>
 
-    <div class="fixed bottom-2 left-1/2 -translate-x-1/2 text-gray-400 text-xs">
-        Крок <span id="step-counter">0</span> / 13
+    <!-- Навігація -->
+    <div class="controls">
+        <div id="prev-btn" class="nav-btn hidden">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+            Назад
+        </div>
+        <div id="next-btn" class="nav-btn">
+            Далі
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+        </div>
     </div>
 
     <script>
         let currentStep = 0;
-        const totalSteps = 13;
+        const totalSteps = 12;
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
 
         function updateUI() {
             for (let i = 1; i <= totalSteps; i++) {
-                const el = document.getElementById(`step-${i}`);
-                if (el) i <= currentStep ? el.classList.add('visible') : el.classList.remove('visible');
+                const el = document.getElementById(`s${i}`);
+                if (el) {
+                    if (i <= currentStep) {
+                        el.classList.add('visible');
+                    } else {
+                        el.classList.remove('visible');
+                    }
+                }
             }
-            document.getElementById('step-counter').innerText = currentStep;
-            document.getElementById('prev-btn').style.visibility = currentStep === 0 ? "hidden" : "visible";
+
+            prevBtn.classList.toggle('hidden', currentStep === 0);
+            nextBtn.classList.toggle('hidden', currentStep === totalSteps);
             
+            if (currentStep === totalSteps) {
+                nextBtn.innerHTML = 'Заново';
+                nextBtn.classList.remove('hidden');
+            } else {
+                nextBtn.innerHTML = 'Далі <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>';
+            }
+
             if (window.MathJax && window.MathJax.typesetPromise) {
                 window.MathJax.typesetPromise();
             }
         }
 
-        const next = () => { if (currentStep < totalSteps) { currentStep++; updateUI(); } };
-        const prev = () => { if (currentStep > 0) { currentStep--; updateUI(); } };
+        nextBtn.onclick = () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+            } else {
+                currentStep = 0;
+            }
+            updateUI();
+        };
 
-        document.getElementById('next-btn').onclick = next;
-        document.getElementById('prev-btn').onclick = prev;
+        prevBtn.onclick = () => {
+            if (currentStep > 0) {
+                currentStep--;
+                updateUI();
+            }
+        };
 
-        let ts;
-        document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; }, false);
-        document.addEventListener('touchend', e => {
-            let te = e.changedTouches[0].clientX;
-            if (ts - te > 50) next();
-            else if (te - ts > 50) prev();
-        }, false);
-
-        document.addEventListener('keydown', e => {
-            if (e.code === 'ArrowRight' || e.code === 'Space') next();
-            if (e.code === 'ArrowLeft') prev();
+        document.body.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-btn')) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateUI();
+                }
+            }
         });
 
-        window.onload = updateUI;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "ArrowRight" || e.key === " ") {
+                nextBtn.click();
+            } else if (e.key === "ArrowLeft") {
+                prevBtn.click();
+            }
+        });
     </script>
 </body>
 </html>
