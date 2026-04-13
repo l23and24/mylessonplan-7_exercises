@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Задача 80.2: Тиск на станції метро</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -27,48 +27,39 @@
             font-family: "Cambria Math", "Cambria", "Times New Roman", serif;
             background-color: #f9f9f9;
             color: #000000;
-            font-size: 20px;
+            font-size: 18px; /* Трохи менший базовий шрифт для мобільних */
             line-height: 1.4;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px 0;
-            touch-action: pan-y;
+            padding: 10px 0 80px 0; /* Відступ знизу для навігації */
+            touch-action: manipulation; /* Запобігає зуму при швидких кліках */
+            overflow-x: hidden;
         }
 
         .main-wrapper {
             background-color: #ffffff;
             width: 95%;
             max-width: 1100px;
-            padding: 30px;
+            padding: 20px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border-radius: 8px;
-        }
-
-        .task-header {
-            margin-bottom: 25px;
-            text-align: left;
+            box-sizing: border-box;
         }
 
         .task-title {
             font-weight: bold;
-            font-size: 28px;
+            font-size: 24px;
             margin-bottom: 10px;
             color: #1a1a1a;
-        }
-
-        .task-text {
-            font-size: 20px;
-            text-align: justify;
         }
 
         .step {
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.4s ease-out;
-            font-size: 20px;
         }
 
         .step.visible {
@@ -76,7 +67,7 @@
             visibility: visible;
         }
 
-        /* Таблиця без зовнішніх горизонтальних ліній */
+        /* Таблиця */
         .physics-grid {
             display: grid;
             grid-template-columns: 1fr 0.6fr 1.4fr 1fr;
@@ -84,29 +75,19 @@
         }
 
         .column {
-            padding: 15px;
+            padding: 10px;
             border-right: 1px solid #ddd;
         }
 
-        .column:last-child {
-            border-right: none;
-        }
-
-        /* Жирна вертикальна лінія після Дано та СІ */
-        .v-line-bold {
-            border-right: 2px solid black;
-        }
+        .v-line-bold { border-right: 2px solid black; }
 
         .header-cell {
             font-weight: bold;
-            font-size: 22px; 
-            margin-bottom: 20px;
+            font-size: 20px; 
+            margin-bottom: 15px;
             text-align: center;
         }
 
-        .header-left { text-align: left; }
-
-        /* Коротка лінія під Дано */
         .h-line-short {
             border-top: 2px solid black;
             margin-top: 20px;
@@ -114,13 +95,13 @@
             width: 80%;
         }
 
-        /* Кнопки навігації */
+        /* Навігація */
         .nav-arrow {
             position: fixed;
             top: 50%;
             transform: translateY(-50%);
-            width: 60px;
-            height: 90px;
+            width: 50px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -131,59 +112,44 @@
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             user-select: none;
-            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .nav-arrow:hover { background: #fff; transform: translateY(-50%) scale(1.05); }
-        .nav-arrow.left { left: 15px; }
-        .nav-arrow.right { right: 15px; }
+        .nav-arrow.left { left: 10px; }
+        .nav-arrow.right { right: 10px; }
 
-        /* Відповідь без верхньої лінії */
-        .answer-box {
-            margin-top: 40px;
-            padding: 20px 0;
-            font-weight: bold;
-            font-size: 20px; /* Зрівняв з рештою тексту */
-            text-align: left;
-        }
-
-        /* Мобільна версія */
         @media (max-width: 900px) {
-            .physics-grid {
-                display: block;
-            }
+            body { font-size: 17px; padding-bottom: 100px; }
+            .physics-grid { display: block; }
             .column {
                 border-right: none !important;
                 border-bottom: 1px solid #eee;
                 width: 100% !important;
-                padding: 20px 0;
+                padding: 15px 0;
             }
             .nav-arrow {
                 top: auto;
-                bottom: 30px;
+                bottom: 20px;
                 transform: none;
-                height: 70px;
-                width: 70px;
+                height: 60px;
+                width: 45%; /* Кнопки стають ширшими для зручності */
+                border-radius: 30px;
             }
-            .nav-arrow.left { left: 20px; }
-            .nav-arrow.right { right: 20px; }
-            .main-wrapper { padding: 15px; width: 98%; }
-            .header-cell { text-align: left; background: #f8f8f8; padding: 5px 10px; border-radius: 4px; }
-            .h-line-short { width: 100%; }
+            .nav-arrow.left { left: 4%; }
+            .nav-arrow.right { right: 4%; }
+            .header-cell { text-align: left; background: #f0f0f0; padding: 8px; }
         }
 
-        mjx-container {
-            font-size: 100% !important;
-        }
+        mjx-container { overflow-x: auto; overflow-y: hidden; max-width: 100%; }
     </style>
 </head>
 <body>
 
-    <div id="prev-btn" class="nav-arrow left" title="Попередній крок">
-        <span class="text-4xl text-gray-400">‹</span>
+    <div id="prev-btn" class="nav-arrow left">
+        <span class="text-3xl text-gray-500">Назад</span>
     </div>
-    <div id="next-btn" class="nav-arrow right" title="Наступний крок">
-        <span class="text-4xl text-gray-700">›</span>
+    <div id="next-btn" class="nav-arrow right">
+        <span class="text-3xl text-gray-800">Далі</span>
     </div>
 
     <div class="main-wrapper">
@@ -195,62 +161,54 @@
         </div>
 
         <div id="main-container" class="physics-grid">
-            <!-- Дано -->
             <div class="column v-line-bold">
-                <div class="header-cell header-left">Дано:</div>
-                <div class="space-y-4">
+                <div class="header-cell">Дано:</div>
+                <div class="space-y-3">
                     <div class="step" id="step-1">$p_1 = 101,3 \, \text{кПа}$</div>
                     <div class="step" id="step-2">$h = 110 \, \text{м}$</div>
                     <div class="step" id="step-3">$\Delta p \approx 11,1 \, \frac{\text{Па}}{\text{м}}$</div>
-                    <div class="h-line-short step" id="step-6">
-                        $p_2 - ?$
-                    </div>
+                    <div class="h-line-short step" id="step-6">$p_2 - ?$</div>
                 </div>
             </div>
 
-            <!-- СІ -->
             <div class="column v-line-bold">
                 <div class="header-cell">СІ</div>
-                <div class="space-y-4 text-center">
+                <div class="space-y-3 text-center md:text-left">
                     <div class="step" id="step-4">$101300 \, \text{Па}$</div>
                     <div class="step" id="step-5">---</div>
                 </div>
             </div>
 
-            <!-- Розв'язання -->
             <div class="column v-line-bold">
                 <div class="header-cell">Розв'язання</div>
-                <div class="space-y-5">
-                    <div class="step" id="step-7">При невеликих змінах висоти поблизу поверхні Землі вважають, що на кожні $11 \, \text{м}$ спуску тиск зростає приблизно на $1 \, \text{мм рт. ст.}$</div>
-                    <div class="step" id="step-8">У системі СІ зміна тиску на кожний метр глибини становить приблизно:</div>
+                <div class="space-y-4">
+                    <div class="step" id="step-7">При невеликих змінах висоти тиск змінюється на $11,1 \, \text{Па}$ на кожен метр.</div>
+                    <div class="step" id="step-8">Формула тиску:</div>
                     <div class="step" id="step-9">$\Delta p \approx 11,1 \, \text{Па/м}$</div>
-                    <div class="step" id="step-10">Повний тиск на глибині $h$: $p_2 = p_1 + \Delta p \cdot h$</div>
+                    <div class="step" id="step-10">$p_2 = p_1 + \Delta p \cdot h$</div>
                 </div>
             </div>
 
-            <!-- Обчислення -->
             <div class="column">
-                <div class="header-cell">Обчислення</div>
-                <div class="space-y-6">
+                <div class="header-cell">&nbsp;</div>
+                <div class="space-y-4">
                     <div class="step" id="step-11">
-                        Зміна тиску:
-                        $$ \Delta p = 11,1 \cdot 110 \approx 1221 \, \text{Па} $$
+                        $\Delta p = 11,1 \cdot 110 \approx 1221 \, \text{Па}$
                     </div>
                     <div class="step" id="step-12">
-                        Обчислимо $p_2$:
-                        $$ p_2 = 101300 + 1221 = 102521 \, \text{Па} $$
+                        $p_2 = 101300 + 1221 = 102521 \, \text{Па}$
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="step answer-box" id="step-13">
+        <div class="step answer-box font-bold mt-8" id="step-13">
             Відповідь: $p_2 \approx 102,5 \, \text{кПа}$.
         </div>
     </div>
 
-    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 text-gray-500 text-sm font-sans">
-        Крок <span id="step-counter" class="font-bold">0</span> / 13
+    <div class="fixed bottom-2 left-1/2 -translate-x-1/2 text-gray-400 text-xs">
+        Крок <span id="step-counter">0</span> / 13
     </div>
 
     <script>
@@ -260,14 +218,10 @@
         function updateUI() {
             for (let i = 1; i <= totalSteps; i++) {
                 const el = document.getElementById(`step-${i}`);
-                if (el) {
-                    if (i <= currentStep) el.classList.add('visible');
-                    else el.classList.remove('visible');
-                }
+                if (el) i <= currentStep ? el.classList.add('visible') : el.classList.remove('visible');
             }
             document.getElementById('step-counter').innerText = currentStep;
             document.getElementById('prev-btn').style.visibility = currentStep === 0 ? "hidden" : "visible";
-            document.getElementById('next-btn').style.opacity = currentStep === totalSteps ? "0.3" : "1";
             
             if (window.MathJax && window.MathJax.typesetPromise) {
                 window.MathJax.typesetPromise();
@@ -280,16 +234,16 @@
         document.getElementById('next-btn').onclick = next;
         document.getElementById('prev-btn').onclick = prev;
 
-        let touchstartX = 0;
-        let touchendX = 0;
-        document.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, false);
+        // Покращений Touch для мобільних (swipe)
+        let ts;
+        document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; }, false);
         document.addEventListener('touchend', e => {
-            touchendX = e.changedTouches[0].screenX;
-            if (touchstartX - touchendX > 70) next();
-            if (touchendX - touchstartX > 70) prev();
+            let te = e.changedTouches[0].clientX;
+            if (ts - te > 50) next();
+            else if (te - ts > 50) prev();
         }, false);
 
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', e => {
             if (e.code === 'ArrowRight' || e.code === 'Space') next();
             if (e.code === 'ArrowLeft') prev();
         });
