@@ -1,25 +1,230 @@
-📘 Інструкція до цифрової вправи з фізики
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Задача № 80.1 - Кириличні індекси</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: "Cambria Math", "Cambria", "Times New Roman", serif;
+            background-color: #ffffff;
+            color: #000000;
+            font-size: 22px;
+            line-height: 1.4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            overflow-x: hidden;
+        }
 
-Ця вправа допоможе тобі самостійно розібратися з розв'язанням задачі на залежність атмосферного тиску від висоти.
+        /* Скасування курсиву для всіх елементів, включаючи MathJax */
+        * { font-style: normal !important; }
 
-📱 Як відкрити:
+        .task-header {
+            width: 90%;
+            max-width: 1000px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
 
-Перейди за посиланням, яке надав вчитель.
+        .task-title {
+            font-weight: bold;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
 
-Вправа адаптована під мобільні телефони: якщо ти відкриєш її на смартфоні, блоки розгорнуться один під одним для зручного читання.
+        .task-text {
+            font-size: 20px;
+            text-align: justify;
+        }
 
-⚙️ Як працювати з вправою:
+        .step {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none;
+        }
 
-Поступовість: Розв'язання не з'являється відразу. Це зроблено для того, щоб ти міг подумати над кожним кроком.
+        .step.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-Кнопки навігації:
+        .physics-table {
+            display: table;
+            width: 90%;
+            max-width: 1000px;
+            border-collapse: collapse;
+            margin: 0 auto;
+            table-layout: fixed;
+        }
 
-Синя кнопка зі стрілкою вправо (→) внизу екрана — відкриває наступний крок (Дано, Формула, Обчислення).
+        .row { display: table-row; }
 
-Сіра кнопка зі стрілкою вліво (←) — дозволяє повернутися назад, якщо хочеш ще раз переглянути попередній етап.
+        .cell {
+            display: table-cell;
+            vertical-align: top;
+            padding: 10px 20px;
+        }
 
-Інтерактивність: Якщо ти працюєш за комп'ютером, можна використовувати стрілки на клавіатурі.
+        .header-cell {
+            font-weight: bold;
+            font-size: 22px; 
+            padding-bottom: 15px;
+            height: 50px;
+        }
 
-💡 Порада для навчання:
+        .v-line { border-right: 2px solid black; }
 
-Спробуй спочатку прочитати умову задачі та записати "Дано" у свій зошит самостійно. Потім натисни на стрілку і перевір себе. Так само зроби з формулами та обчисленнями.
+        .h-line-dano {
+            border-top: 2px solid black;
+            margin-top: 20px;
+            padding-top: 20px;
+        }
+
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.03);
+            color: #888;
+            width: 60px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            z-index: 1000;
+            border-radius: 8px;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(0, 0, 0, 0.08);
+            color: #000;
+        }
+
+        #prev-arrow { left: 10px; }
+        #next-arrow { right: 10px; }
+
+        .answer-box {
+            width: 90%;
+            max-width: 1000px;
+            border-top: 2px solid black;
+            margin-top: 50px;
+            padding-top: 20px;
+            font-weight: bold;
+            text-align: left;
+            margin-bottom: 100px;
+        }
+
+        .formula-list mjx-container {
+            margin: 20px 0 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="task-header">
+        <div class="task-title">№ 80.1</div>
+        <div class="task-text">
+            У квартирі Іванки барометр показує атмосферний тиск 732 мм рт. ст. У квартирі Дениса той же барометр показує тиск 734 мм рт. ст. Вище чи нижче поверхом розміщується квартира Дениса порівняно з квартирою Іванки? На скільки метрів приблизно одна квартира розміщена вище другої?
+        </div>
+    </div>
+
+    <div class="physics-table">
+        <div class="row">
+            <!-- Колонка 1: Дано -->
+            <div class="cell v-line" style="width: 32%;">
+                <div class="header-cell">Дано:</div>
+                <div class="space-y-4">
+                    <div class="step" id="s1">$p_{\text{І}} = 732 \, \text{мм рт. ст.}$</div>
+                    <div class="step" id="s2">$p_{\text{Д}} = 734 \, \text{мм рт. ст.}$</div>
+                    <div class="step" id="s3">$h_0 \approx 11 \, \text{м/мм рт. ст.}$</div>
+                    <div class="h-line-dano step" id="s4">
+                        <div class="mb-2">Денис вище/нижче?</div>
+                        <div>$\Delta h - ?$</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Колонка 2: Розв'язання -->
+            <div class="cell v-line" style="width: 34%;">
+                <div class="header-cell text-center">Розв'язання</div>
+                <div class="formula-list">
+                    <div class="step" id="s5">
+                        <p class="text-lg">Оскільки з висотою тиск зменшується, а $p_{\text{І}} < p_{\text{Д}}$, то квартира Іванки вище.</p>
+                    </div>
+                    <div class="step" id="s6">$$ \Delta p = p_{\text{Д}} - p_{\text{І}} $$</div>
+                    <div class="step" id="s7">$$ \Delta h = \Delta p \cdot h_0 $$</div>
+                </div>
+            </div>
+
+            <!-- Колонка 3: Обчислення -->
+            <div class="cell" style="width: 34%;">
+                <div class="header-cell"></div>
+                <div class="formula-list">
+                    <div class="step" id="s8">
+                        $$ \Delta p = 734 - 732 = 2 \, (\text{мм рт. ст.}) $$
+                    </div>
+                    <div class="step" id="s9">
+                        $$ \Delta h = 2 \cdot 11 \approx 22 \, (\text{м}) $$
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="step answer-box" id="s10">
+        Відповідь: квартира Дениса розміщується нижче за квартиру Іванки; одна квартира вище другої приблизно на 22 м.
+    </div>
+
+    <!-- Навігація -->
+    <div id="prev-arrow" class="nav-arrow" style="visibility: hidden;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </div>
+    <div id="next-arrow" class="nav-arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </div>
+
+    <script>
+        window.onload = function() {
+            let currentStep = 0;
+            const stepsIds = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10"];
+            const nextBtn = document.getElementById('next-arrow');
+            const prevBtn = document.getElementById('prev-arrow');
+
+            function updateUI() {
+                stepsIds.forEach((id, index) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        index < currentStep ? el.classList.add('visible') : el.classList.remove('visible');
+                    }
+                });
+                if (window.MathJax) MathJax.typeset();
+                prevBtn.style.visibility = (currentStep === 0) ? 'hidden' : 'visible';
+                nextBtn.style.visibility = (currentStep === stepsIds.length) ? 'hidden' : 'visible';
+            }
+
+            nextBtn.onclick = () => { if (currentStep < stepsIds.length) { currentStep++; updateUI(); } };
+            prevBtn.onclick = () => { if (currentStep > 0) { currentStep--; updateUI(); } };
+            document.onkeydown = (e) => {
+                if (e.key === "ArrowRight" || e.key === " ") nextBtn.click();
+                else if (e.key === "ArrowLeft") prevBtn.click();
+            };
+            updateUI();
+        };
+    </script>
+</body>
+</html>
