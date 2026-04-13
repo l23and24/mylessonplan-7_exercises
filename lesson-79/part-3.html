@@ -3,228 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Задача № 80.1 - Кириличні індекси</title>
+    <title>Задача № 80.1 - Адаптивна версія</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         window.MathJax = {
             tex: {
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
                 displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                renderActions: {
+                    addMenu: [] // Прибираємо контекстне меню MathJax для зручності на мобільних
+                }
             }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
+        /* Використовуємо стандартні шрифти для кращої сумісності */
         body {
-            font-family: "Cambria Math", "Cambria", "Times New Roman", serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Times New Roman", serif;
             background-color: #ffffff;
             color: #000000;
-            font-size: 22px;
-            line-height: 1.4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 20px;
+            line-height: 1.5;
             overflow-x: hidden;
+            margin: 0;
+            padding: 15px;
+            font-size: 18px; /* Оптимально для смартфонів */
         }
 
-        /* Скасування курсиву для всіх елементів, включаючи MathJax */
+        /* Адаптація розміру шрифту для великих екранів */
+        @media (min-width: 768px) {
+            body { font-size: 20px; }
+            .container { max-width: 1000px; margin: 0 auto; }
+        }
+
+        /* Скасування курсиву */
         * { font-style: normal !important; }
 
-        .task-header {
-            width: 90%;
-            max-width: 1000px;
-            margin-bottom: 30px;
-            text-align: left;
+        .task-card {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e5e7eb;
         }
 
         .task-title {
             font-weight: bold;
-            font-size: 26px;
-            margin-bottom: 8px;
+            font-size: 1.4rem;
+            color: #1f2937;
+            margin-bottom: 10px;
         }
 
         .task-text {
-            font-size: 20px;
-            text-align: justify;
+            text-align: justify; /* Вирівнювання по ширині */
+            hyphens: auto; /* Додаємо автоматичні переноси для кращого вигляду на вузьких екранах */
         }
 
         .step {
             opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+            transform: translateY(10px);
+            transition: all 0.4s ease-out;
             pointer-events: none;
+            margin-bottom: 15px;
         }
 
         .step.visible {
             opacity: 1;
+            transform: translateY(0);
             pointer-events: auto;
         }
 
-        .physics-table {
-            display: table;
-            width: 90%;
-            max-width: 1000px;
-            border-collapse: collapse;
-            margin: 0 auto;
-            table-layout: fixed;
+        /* Основна сітка задачі */
+        .physics-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .row { display: table-row; }
-
-        .cell {
-            display: table-cell;
-            vertical-align: top;
-            padding: 10px 20px;
+        @media (min-width: 768px) {
+            .physics-grid {
+                flex-direction: row;
+                align-items: stretch;
+            }
+            .grid-col {
+                flex: 1;
+                padding: 0 15px;
+            }
+            .v-line { border-right: 2px solid #000; }
         }
 
         .header-cell {
             font-weight: bold;
-            font-size: 22px; 
-            padding-bottom: 15px;
-            height: 50px;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
         }
 
-        .v-line { border-right: 2px solid black; }
-
-        .h-line-dano {
-            border-top: 2px solid black;
-            margin-top: 20px;
-            padding-top: 20px;
+        .dano-divider {
+            border-top: 2px solid #000;
+            margin-top: 15px;
+            padding-top: 15px;
         }
 
-        .nav-arrow {
+        /* Кнопки навігації (фіксовані знизу для зручності великого пальця) */
+        .controls {
             position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.03);
-            color: #888;
-            width: 60px;
-            height: 100px;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .nav-btn {
+            pointer-events: auto;
+            background: #1f2937;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            user-select: none;
-            z-index: 1000;
-            border-radius: 8px;
+            gap: 8px;
+            transition: transform 0.2s;
         }
 
-        .nav-arrow:hover {
-            background: rgba(0, 0, 0, 0.08);
-            color: #000;
-        }
-
-        #prev-arrow { left: 10px; }
-        #next-arrow { right: 10px; }
+        .nav-btn:active { transform: scale(0.95); }
+        .nav-btn.hidden { visibility: hidden; opacity: 0; }
 
         .answer-box {
-            width: 90%;
-            max-width: 1000px;
-            border-top: 2px solid black;
-            margin-top: 50px;
-            padding-top: 20px;
+            border-top: 3px solid #000;
+            margin-top: 40px;
+            padding: 20px 0;
             font-weight: bold;
-            text-align: left;
             margin-bottom: 100px;
-        }
-
-        .formula-list mjx-container {
-            margin: 20px 0 !important;
         }
     </style>
 </head>
 <body>
 
-    <div class="task-header">
-        <div class="task-title">№ 80.1</div>
-        <div class="task-text">
-            У квартирі Іванки барометр показує атмосферний тиск 732 мм рт. ст. У квартирі Дениса той же барометр показує тиск 734 мм рт. ст. Вище чи нижче поверхом розміщується квартира Дениса порівняно з квартирою Іванки? На скільки метрів приблизно одна квартира розміщена вище другої?
+    <div class="container">
+        <div class="task-card">
+            <div class="task-title">Задача № 80.1</div>
+            <div class="task-text">
+                У квартирі Іванки барометр показує атмосферний тиск $732 \, \text{мм рт. ст.}$ У квартирі Дениса той же барометр показує тиск $734 \, \text{мм рт. ст.}$ Вище чи нижче поверхом розміщується квартира Дениса порівняно з квартирою Іванки? На скільки метрів приблизно одна квартира розміщена вище другої?
+            </div>
         </div>
-    </div>
 
-    <div class="physics-table">
-        <div class="row">
-            <!-- Колонка 1: Дано -->
-            <div class="cell v-line" style="width: 32%;">
+        <div class="physics-grid">
+            <!-- Дано -->
+            <div class="grid-col v-line">
                 <div class="header-cell">Дано:</div>
-                <div class="space-y-4">
-                    <div class="step" id="s1">$p_{\text{І}} = 732 \, \text{мм рт. ст.}$</div>
-                    <div class="step" id="s2">$p_{\text{Д}} = 734 \, \text{мм рт. ст.}$</div>
-                    <div class="step" id="s3">$h_0 \approx 11 \, \text{м/мм рт. ст.}$</div>
-                    <div class="h-line-dano step" id="s4">
-                        <div class="mb-2">Денис вище/нижче?</div>
-                        <div>$\Delta h - ?$</div>
-                    </div>
+                <div id="s1" class="step">$p_{\text{І}} = 732 \, \text{мм рт. ст.}$</div>
+                <div id="s2" class="step">$p_{\text{Д}} = 734 \, \text{мм рт. ст.}$</div>
+                <div id="s3" class="step">$h_0 \approx 11 \, \text{м/мм рт. ст.}$</div>
+                <div id="s4" class="step dano-divider">
+                    <div class="mb-1 text-sm text-gray-600">Денис вище/нижче?</div>
+                    <div>$\Delta h - ?$</div>
                 </div>
             </div>
 
-            <!-- Колонка 2: Розв'язання -->
-            <div class="cell v-line" style="width: 34%;">
-                <div class="header-cell text-center">Розв'язання</div>
-                <div class="formula-list">
-                    <div class="step" id="s5">
-                        <p class="text-lg">Оскільки з висотою тиск зменшується, а $p_{\text{І}} < p_{\text{Д}}$, то квартира Іванки вище.</p>
-                    </div>
-                    <div class="step" id="s6">$$ \Delta p = p_{\text{Д}} - p_{\text{І}} $$</div>
-                    <div class="step" id="s7">$$ \Delta h = \Delta p \cdot h_0 $$</div>
+            <!-- Розв'язання -->
+            <div class="grid-col v-line">
+                <div class="header-cell">Розв'язання</div>
+                <div id="s5" class="step">
+                    <p>Оскільки з висотою тиск зменшується, а $p_{\text{І}} < p_{\text{Д}}$, то квартира Іванки розташована вище.</p>
+                </div>
+                <div id="s6" class="step">
+                    $$ \Delta p = p_{\text{Д}} - p_{\text{І}} $$
+                </div>
+                <div id="s7" class="step">
+                    $$ \Delta h = \Delta p \cdot h_0 $$
                 </div>
             </div>
 
-            <!-- Колонка 3: Обчислення -->
-            <div class="cell" style="width: 34%;">
-                <div class="header-cell"></div>
-                <div class="formula-list">
-                    <div class="step" id="s8">
-                        $$ \Delta p = 734 - 732 = 2 \, (\text{мм рт. ст.}) $$
-                    </div>
-                    <div class="step" id="s9">
-                        $$ \Delta h = 2 \cdot 11 \approx 22 \, (\text{м}) $$
-                    </div>
+            <!-- Обчислення -->
+            <div class="grid-col">
+                <div class="header-cell">Обчислення</div>
+                <div id="s8" class="step">
+                    $$ \Delta p = 734 - 732 = 2 \, (\text{мм рт. ст.}) $$
+                </div>
+                <div id="s9" class="step">
+                    $$ \Delta h = 2 \cdot 11 \approx 22 \, (\text{м}) $$
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="step answer-box" id="s10">
-        Відповідь: квартира Дениса розміщується нижче за квартиру Іванки; одна квартира вище другої приблизно на 22 м.
+        <div id="s10" class="step answer-box">
+            Відповідь: квартира Дениса розміщується нижче за квартиру Іванки; одна квартира вище другої приблизно на $22 \, \text{м}$.
+        </div>
     </div>
 
     <!-- Навігація -->
-    <div id="prev-arrow" class="nav-arrow" style="visibility: hidden;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    </div>
-    <div id="next-arrow" class="nav-arrow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    <div class="controls">
+        <div id="prev-btn" class="nav-btn hidden">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+            Назад
+        </div>
+        <div id="next-btn" class="nav-btn">
+            Далі
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+        </div>
     </div>
 
     <script>
-        window.onload = function() {
-            let currentStep = 0;
-            const stepsIds = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10"];
-            const nextBtn = document.getElementById('next-arrow');
-            const prevBtn = document.getElementById('prev-arrow');
+        let currentStep = 0;
+        const totalSteps = 10;
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
 
-            function updateUI() {
-                stepsIds.forEach((id, index) => {
-                    const el = document.getElementById(id);
-                    if (el) {
-                        index < currentStep ? el.classList.add('visible') : el.classList.remove('visible');
+        function updateUI() {
+            for (let i = 1; i <= totalSteps; i++) {
+                const el = document.getElementById(`s${i}`);
+                if (el) {
+                    if (i <= currentStep) {
+                        el.classList.add('visible');
+                    } else {
+                        el.classList.remove('visible');
                     }
-                });
-                if (window.MathJax) MathJax.typeset();
-                prevBtn.style.visibility = (currentStep === 0) ? 'hidden' : 'visible';
-                nextBtn.style.visibility = (currentStep === stepsIds.length) ? 'hidden' : 'visible';
+                }
             }
 
-            nextBtn.onclick = () => { if (currentStep < stepsIds.length) { currentStep++; updateUI(); } };
-            prevBtn.onclick = () => { if (currentStep > 0) { currentStep--; updateUI(); } };
-            document.onkeydown = (e) => {
-                if (e.key === "ArrowRight" || e.key === " ") nextBtn.click();
-                else if (e.key === "ArrowLeft") prevBtn.click();
-            };
+            // Керування видимістю кнопок
+            prevBtn.classList.toggle('hidden', currentStep === 0);
+            nextBtn.classList.toggle('hidden', currentStep === totalSteps);
+            
+            if (currentStep === totalSteps) {
+                nextBtn.innerHTML = 'Заново';
+                nextBtn.classList.remove('hidden');
+            } else {
+                nextBtn.innerHTML = 'Далі <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>';
+            }
+        }
+
+        nextBtn.onclick = () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+            } else {
+                currentStep = 0;
+            }
             updateUI();
         };
+
+        prevBtn.onclick = () => {
+            if (currentStep > 0) {
+                currentStep--;
+                updateUI();
+            }
+        };
+
+        // Тап по екрану також перемикає крок (зручно на мобільних)
+        document.body.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-btn')) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateUI();
+                }
+            }
+        });
+
+        // Підтримка клавіатури
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "ArrowRight" || e.key === " ") {
+                nextBtn.click();
+            } else if (e.key === "ArrowLeft") {
+                prevBtn.click();
+            }
+        });
     </script>
 </body>
 </html>
