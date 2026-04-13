@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Конвертер тиску: мм рт. ст. у кПа</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f0f4f8;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        /* Покращення для мобільних пристроїв */
+        input[type="number"] {
+            font-size: 16px !important; /* Запобігає зуму в Safari на iOS */
+        }
+        .step-highlight {
+            transition: all 0.2s ease;
+        }
+        @media (max-width: 640px) {
+            h1 { font-size: 1.5rem !important; }
+            .text-3xl { font-size: 1.75rem !important; }
+            .p-4 { padding: 1rem !important; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+    <div class="max-w-3xl mx-auto">
+        <!-- Заголовок -->
+        <header class="text-center mb-6 md:mb-8">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2">Переведення тиску у кПа</h1>
+        </header>
+
+        <!-- Теоретична частина -->
+        <section class="card p-5 md:p-6 mb-6 border-l-4 border-blue-500">
+            <h2 class="text-lg md:text-xl font-semibold mb-3 flex items-center">
+                <span class="mr-2">💡</span> Принцип розрахунку
+            </h2>
+            <p class="mb-4 text-slate-700 text-sm md:text-base">Тиск ртутного стовпа заввишки 1 мм становить приблизно 133,3 Па.</p>
+            <div class="bg-blue-50 p-3 md:p-4 rounded-lg text-center font-mono text-base md:text-lg text-blue-800">
+                1 мм рт. ст. ≈ 133,3 Па
+            </div>
+            <p class="mt-4 text-slate-700 text-sm md:text-base">Щоб отримати значення у <b>кілопаскалях (кПа)</b>, результат у паскалях ділиться на 1000.</p>
+        </section>
+
+        <!-- Калькулятор -->
+        <section class="card p-5 md:p-6 mb-6">
+            <h2 class="text-lg md:text-xl font-semibold mb-4 text-slate-800">Розрахунок значення</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Значення (мм рт. ст.):</label>
+                    <input type="number" id="inputPressure" value="560" 
+                           inputmode="decimal"
+                           class="w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition-all"
+                           oninput="calculate()">
+                </div>
+
+                <div id="steps" class="space-y-3 mt-6">
+                    <!-- Крок 1 -->
+                    <div class="step-highlight p-3 border-l-4 border-slate-200 bg-slate-50 rounded-r-lg">
+                        <p class="text-[10px] md:text-xs text-slate-400 font-bold uppercase">Крок 1: Паскалі</p>
+                        <p id="step1Display" class="text-base md:text-lg font-mono text-slate-800 break-words"></p>
+                    </div>
+
+                    <!-- Крок 2 -->
+                    <div class="step-highlight p-3 border-l-4 border-slate-200 bg-slate-50 rounded-r-lg">
+                        <p class="text-[10px] md:text-xs text-slate-400 font-bold uppercase">Крок 2: Кілопаскалі</p>
+                        <p id="step2Display" class="text-base md:text-lg font-mono text-slate-800 break-words"></p>
+                    </div>
+                </div>
+
+                <!-- Фінальний результат -->
+                <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl text-center">
+                    <p class="text-green-800 text-sm font-medium">Результат:</p>
+                    <div id="finalResult" class="text-2xl md:text-3xl font-bold text-green-700"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Завдання для самоперевірки -->
+        <h2 class="text-lg md:text-xl font-bold text-slate-800 mb-4 px-2">Завдання для самоперевірки</h2>
+        <section class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <!-- Картка завдання 1 -->
+            <div class="card p-5 border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-1">Завдання №1</h3>
+                    <p class="text-slate-600 text-sm mb-4">Виразіть у кПа тиск <span class="font-bold whitespace-nowrap">560 мм рт. ст.</span></p>
+                </div>
+                <button onclick="setExample(560)" class="w-full py-3 px-4 bg-blue-600 active:bg-blue-800 text-white rounded-xl transition-colors text-sm font-medium shadow-sm">
+                    Перевірити
+                </button>
+            </div>
+            <!-- Картка завдання 2 -->
+            <div class="card p-5 border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-slate-800 mb-1">Завдання №2</h3>
+                    <p class="text-slate-600 text-sm mb-4">Виразіть у кПа тиск <span class="font-bold whitespace-nowrap">830 мм рт. ст.</span></p>
+                </div>
+                <button onclick="setExample(830)" class="w-full py-3 px-4 bg-blue-600 active:bg-blue-800 text-white rounded-xl transition-colors text-sm font-medium shadow-sm">
+                    Перевірити
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function calculate() {
+            const inputElement = document.getElementById('inputPressure');
+            const step1Display = document.getElementById('step1Display');
+            const step2Display = document.getElementById('step2Display');
+            const finalResult = document.getElementById('finalResult');
+
+            const input = inputElement.value;
+
+            if (input === "" || parseFloat(input) < 0) {
+                step1Display.innerText = "Введіть значення...";
+                step2Display.innerText = "-";
+                finalResult.innerText = "0 кПа";
+                return;
+            }
+
+            const val = parseFloat(input);
+            const pa = (val * 133.3).toFixed(1);
+            const kpa = (pa / 1000).toFixed(3);
+
+            // Оновлення кроків
+            step1Display.innerHTML = `${val.toString().replace('.', ',')} \u22C5 133,3 = <span class="text-blue-600 font-bold">${pa.toString().replace('.', ',')}</span> Па`;
+            step2Display.innerHTML = `${pa.toString().replace('.', ',')} : 1000 = <span class="text-blue-600 font-bold">${kpa.toString().replace('.', ',')}</span> кПа`;
+            
+            finalResult.innerText = `${kpa.toString().replace('.', ',')} кПа`;
+        }
+
+        function setExample(val) {
+            const input = document.getElementById('inputPressure');
+            input.value = val;
+            calculate();
+            
+            // Скрол до калькулятора з врахуванням мобільного екрана
+            window.scrollTo({
+                top: input.getBoundingClientRect().top + window.pageYOffset - 100,
+                behavior: 'smooth'
+            });
+            
+            input.classList.add('ring-4', 'ring-blue-500/30');
+            setTimeout(() => {
+                input.classList.remove('ring-4', 'ring-blue-500/30');
+            }, 800);
+        }
+
+        window.onload = calculate;
+    </script>
+</body>
+</html>
