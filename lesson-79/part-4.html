@@ -27,15 +27,15 @@
             font-family: "Cambria Math", "Cambria", "Times New Roman", serif;
             background-color: #f9f9f9;
             color: #000000;
-            font-size: 18px; /* Трохи менший базовий шрифт для мобільних */
+            font-size: 18px;
             line-height: 1.4;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 10px 0 80px 0; /* Відступ знизу для навігації */
-            touch-action: manipulation; /* Запобігає зуму при швидких кліках */
+            padding: 10px 0 80px 0;
+            touch-action: manipulation;
             overflow-x: hidden;
         }
 
@@ -67,7 +67,6 @@
             visibility: visible;
         }
 
-        /* Таблиця */
         .physics-grid {
             display: grid;
             grid-template-columns: 1fr 0.6fr 1.4fr 1fr;
@@ -95,28 +94,34 @@
             width: 80%;
         }
 
-        /* Навігація */
+        /* Навігація зі стрілками */
         .nav-arrow {
             position: fixed;
             top: 50%;
             transform: translateY(-50%);
-            width: 50px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             border: 1px solid #ddd;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            transition: all 0.2s;
         }
 
-        .nav-arrow.left { left: 10px; }
-        .nav-arrow.right { right: 10px; }
+        .nav-arrow:hover {
+            background: #fff;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        .nav-arrow.left { left: 20px; }
+        .nav-arrow.right { right: 20px; }
 
         @media (max-width: 900px) {
             body { font-size: 17px; padding-bottom: 100px; }
@@ -131,12 +136,11 @@
                 top: auto;
                 bottom: 20px;
                 transform: none;
-                height: 60px;
-                width: 45%; /* Кнопки стають ширшими для зручності */
-                border-radius: 30px;
+                width: 70px;
+                height: 70px;
             }
-            .nav-arrow.left { left: 4%; }
-            .nav-arrow.right { right: 4%; }
+            .nav-arrow.left { left: 10%; }
+            .nav-arrow.right { right: 10%; }
             .header-cell { text-align: left; background: #f0f0f0; padding: 8px; }
         }
 
@@ -145,11 +149,11 @@
 </head>
 <body>
 
-    <div id="prev-btn" class="nav-arrow left">
-        <span class="text-3xl text-gray-500">Назад</span>
+    <div id="prev-btn" class="nav-arrow left" title="Попередній крок">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="m15 18-6-6 6-6"/></svg>
     </div>
-    <div id="next-btn" class="nav-arrow right">
-        <span class="text-3xl text-gray-800">Далі</span>
+    <div id="next-btn" class="nav-arrow right" title="Наступний крок">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-800"><path d="m9 18 6-6-6-6"/></svg>
     </div>
 
     <div class="main-wrapper">
@@ -234,7 +238,6 @@
         document.getElementById('next-btn').onclick = next;
         document.getElementById('prev-btn').onclick = prev;
 
-        // Покращений Touch для мобільних (swipe)
         let ts;
         document.addEventListener('touchstart', e => { ts = e.touches[0].clientX; }, false);
         document.addEventListener('touchend', e => {
